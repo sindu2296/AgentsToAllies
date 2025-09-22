@@ -1,3 +1,5 @@
+# https://learn.microsoft.com/en-us/semantic-kernel/get-started/quick-start-guide?pivots=programming-language-python
+
 import asyncio
 import os
 from dotenv import load_dotenv
@@ -121,5 +123,3 @@ if __name__ == "__main__":
 # )
 
 # print(response.model_dump_json(indent=2)) 
-
-# https://learn.microsoft.com/en-us/semantic-kernel/get-started/quick-start-guide?pivots=programming-language-python
