@@ -3,9 +3,11 @@ from dotenv import load_dotenv
 
 import os
 from dotenv import load_dotenv
+
 from semantic_kernel import Kernel
 from openai import AsyncAzureOpenAI
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
+from job_recommendation.src.plugins.job_board_plugin import JobBoardPlugin
 
 load_dotenv()
 
@@ -34,5 +36,8 @@ def build_kernel() -> Kernel:
 
     # Add the service to the kernel
     kernel.add_service(chat_completion)
+
+    # Register SerpAPI plugin (JobBoardPlugin)
+    kernel.add_plugin(JobBoardPlugin(), plugin_name="job_board_plugin")
 
     return kernel

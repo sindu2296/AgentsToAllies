@@ -1,17 +1,3 @@
-from ..config import build_kernel
-
-class JobRecommenderAgent:
-    """Recommends jobs based on user profile and extracted jobs."""
-    def __init__(self, kernel=None):
-        self.kernel = kernel or build_kernel()
-
-    def run(self, user_profile, jobs):
-        """
-        Uses Semantic Kernel to recommend jobs based on user profile.
-        """
-        # Example: Use kernel to rank jobs by relevance to user_profile
-        if not jobs:
-            return []
 from semantic_kernel.agents import ChatCompletionAgent
 from ..config import build_kernel
 
