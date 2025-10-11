@@ -20,7 +20,7 @@ Demonstrates custom orchestration with sequential execution:
 - Shows how to implement complex flows without built-in orchestrators
 - Simpler architecture but takes longer for multiple categories
 
-### 3. Pro/Parallel/Concurrent Processing (`main_pro.py`)
+### 3. Concurrent Processing (`main_concurrent.py`)
 In this scenario, the news processing happens in parallel:
 - Uses a router agent to determine relevant categories
 - Multiple category agents work in parallel
@@ -74,9 +74,9 @@ This will demonstrate:
 - Processing multiple categories sequentially (one at a time)
 - Deduplication and summarization of articles
 
-### Pro/Parallel Processing
+### Concurrent Processing
 ```powershell
-python .\src\main_pro.py
+python .\src\main_concurrent.py
 ```
 This will demonstrate:
 - Smart category routing based on user queries
@@ -86,7 +86,7 @@ This will demonstrate:
 
 ## Sample Queries
 
-Try these example queries with the pro version:
+Try these example queries with the concurrent version:
 1. "Round up AI chip and cloud infra news"
 2. "What happened in sports and health this morning?"
 3. "Give me business and tech headlines about big tech"
@@ -100,8 +100,8 @@ Demonstrated in two ways:
 - `main_basic.py`: Uses the built-in `SequentialOrchestration` class with a predefined pipeline
 - `main_sequential.py`: Implements custom sequential orchestration with multiple agents
 
-### Concurrent Orchestration (`main_pro.py`)
-Uses `asyncio.gather()` for concurrent execution of multiple agents, allowing parallel processing of different news categories.
+### Concurrent Orchestration (`main_concurrent.py`)
+Uses Semantic Kernel's `ConcurrentOrchestration` for concurrent execution of multiple agents, allowing parallel processing of different news categories.
 
 ## Implementation Architecture
 
@@ -112,7 +112,7 @@ Components:
 - Summarizer Agent: Creates concise summaries
 - Deduplication: Removes duplicate articles
 
-### Pro Version
+### Concurrent Version
 Components:
 - Router Agent: Determines relevant news categories
 - Category Agents: Fetch news for specific categories

@@ -18,10 +18,21 @@ Located in `semantickernel_sample.py`, this demonstrates how to:
 - Handle interactive conversations using chat history
 
 ### 3. News Processing with Multiple Agents
-Located in the `news` folder, this sample shows three different approaches to processing news using multiple agents:
+Located in the `news` and `news_maf` folders, these samples show **two different frameworks** for building the same multi-agent news system:
+
+#### Semantic Kernel Implementation (`news/`)
 - Basic: Simple sequential processing with one agent
 - Sequential: Multiple agents working one after another
-- Pro: Parallel processing with multiple agents working simultaneously
+- Concurrent: Parallel processing with `ConcurrentOrchestration`
+- Uses: Kernel, plugins, `@kernel_function`, `FunctionChoiceBehavior.Auto()`
+
+#### Microsoft Agent Framework Implementation (`news_maf/`)
+- Sequential: Multiple agents working one after another
+- Concurrent: Parallel processing with `asyncio.gather()`
+- Uses: `ChatAgent`, function tools, simpler setup
+- Great for: Comparing agent frameworks, learning different approaches
+
+Both implementations provide the same functionality but with different patterns and abstractions.
 
 For detailed instructions on running each sample, check the README files in their respective folders.ToAllies
 
