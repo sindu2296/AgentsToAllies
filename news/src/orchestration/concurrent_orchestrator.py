@@ -1,6 +1,6 @@
 import json
 import asyncio
-from typing import List
+from typing import Dict, List
 from semantic_kernel import Kernel
 from semantic_kernel.agents import ConcurrentOrchestration, ChatCompletionAgent
 from semantic_kernel.agents.runtime import InProcessRuntime
@@ -28,6 +28,8 @@ class ConcurrentNewsOrchestrator:
         self.router = build_router_agent(kernel)
         self.runtime = InProcessRuntime()
         self.runtime.start()
+        # Track a few recent headlines per category so agents can avoid repeats.
+        self._category_memory: Dict[str, List[dict]] = {}
 
     async def run(self, user_query: str) -> str:
         """Process a user query and return a news summary."""
@@ -38,10 +40,12 @@ class ConcurrentNewsOrchestrator:
         print(f"[ROUTING] Selected categories: {categories}")
         
         # Step 2: Create category agents for parallel fetching
-        category_agents = [
-            build_category_agent(self.kernel, f"{cat}_agent", cat) 
-            for cat in categories
-        ]
+        category_agents = []
+        for cat in categories:
+            memory = self._category_memory.get(cat)
+            category_agents.append(
+                build_category_agent(self.kernel, f"{cat}_agent", cat, memory)
+            )
         
         print(f"\n[FETCHING] Fetching from {len(categories)} categories in parallel...")
         
@@ -58,6 +62,8 @@ class ConcurrentNewsOrchestrator:
         all_articles = []
         results = await orchestration_result.get()
         
+        category_articles: Dict[str, List[dict]] = {}
+
         for i, result in enumerate(results):
             category = categories[i]
             try:
@@ -65,6 +71,7 @@ class ConcurrentNewsOrchestrator:
                 articles = json.loads(response)
                 if isinstance(articles, list):
                     all_articles.extend(articles)
+                    category_articles[category] = articles
                     print(f"[SUCCESS] {category}: {len(articles)} articles")
             except json.JSONDecodeError:
                 print(f"[ERROR] Failed to parse response for {category}")
@@ -76,6 +83,10 @@ class ConcurrentNewsOrchestrator:
             return "No articles found."
         
         print(f"\n[DEDUP] {len(unique_articles)} unique articles after deduplication")
+
+        # Refresh memory with the latest batch (limit to a few items to keep prompts lean).
+        for category, articles in category_articles.items():
+            self._category_memory[category] = articles[:5]
         
         # Step 6: Summarize using the summarizer agent
         print(f"[SUMMARIZING] Creating executive brief...")
