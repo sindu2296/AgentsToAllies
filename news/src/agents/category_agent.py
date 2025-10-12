@@ -2,6 +2,9 @@ from semantic_kernel.agents import ChatCompletionAgent
 from semantic_kernel import Kernel
 from semantic_kernel.connectors.ai import FunctionChoiceBehavior
 from semantic_kernel.functions import KernelArguments
+from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_prompt_execution_settings import (
+    AzureChatPromptExecutionSettings,
+)
 
 def build_category_agent(kernel: Kernel, name: str, category: str) -> ChatCompletionAgent:
     """
@@ -16,8 +19,8 @@ def build_category_agent(kernel: Kernel, name: str, category: str) -> ChatComple
         "Return the JSON result exactly as received from the function."
     )
     
-    # Configure the agent to automatically invoke functions
-    settings = kernel.get_prompt_execution_settings_from_service_id()
+    # Configure function-calling behavior explicitly for Azure Chat completions
+    settings = AzureChatPromptExecutionSettings()
     settings.function_choice_behavior = FunctionChoiceBehavior.Auto()
     
     return ChatCompletionAgent(

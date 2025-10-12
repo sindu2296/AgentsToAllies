@@ -29,10 +29,11 @@ In this scenario, the news processing happens in parallel:
 
 ## Prerequisites
 
-1. Python 3.9+ and pip installed
-2. Required environment variables in a `.env` file:
+1. Install python 3.9+ `winget install Python.Python.3.13`
+2. Option to use VS code as IDE. Available to install from https://code.visualstudio.com/
+3. Required environment variables in a `.env` file:
    ```
-   AZURE_OPENAI_ENDPOINT=your_azure_endpoint
+   AI_FOUNDRY_AZURE_OPENAI_API_KEY=your_azure_endpoint
    MODEL_NAME=your_model_name
    AI_FOUNDRY_AZURE_OPENAI_API_KEY=your_api_key
    NEWSAPI_API_KEY=your_newsapi_key

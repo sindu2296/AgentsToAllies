@@ -20,8 +20,8 @@ async def main():
 
     queries = [
         "Round up AI chip and cloud infra news",
-        # "What happened in sports and health this morning?",
-        # "Give me business and tech headlines about big tech",
+        "What happened in sports and health this morning?",
+        "Give me business and tech headlines about big tech",
     ]
 
     for query in queries:
