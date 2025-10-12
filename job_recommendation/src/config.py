@@ -1,13 +1,9 @@
 import os
 from dotenv import load_dotenv
-
-import os
-from dotenv import load_dotenv
-
 from semantic_kernel import Kernel
 from openai import AsyncAzureOpenAI
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
-from job_recommendation.src.plugins.job_board_plugin import JobBoardPlugin
+from plugins.job_board_plugin import JobBoardPlugin
 
 load_dotenv()
 

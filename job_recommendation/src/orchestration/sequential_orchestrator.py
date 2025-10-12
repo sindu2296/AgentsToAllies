@@ -6,11 +6,11 @@ from semantic_kernel.agents import ChatCompletionAgent, SequentialOrchestration
 from semantic_kernel import Kernel
 from semantic_kernel.agents.runtime import InProcessRuntime
 from semantic_kernel.contents import ChatMessageContent
-from ..agents.job_extractor_agent import build_job_extractor_agent
-from ..agents.job_recommender_agent import build_job_recommender_agent
-from ..agents.job_summary_agent import build_job_summary_agent
-from ..utils.dedup_utils import deduplicate_jobs
-from ..utils.job_cleaner_utils import clean_job_data
+from agents.job_extractor_agent import build_job_extractor_agent
+from agents.job_recommender_agent import build_job_recommender_agent
+from agents.job_summary_agent import build_job_summary_agent
+from utils.dedup_utils import deduplicate_jobs
+from utils.job_cleaner_utils import clean_job_data
 
 def get_agents(kernel: Kernel) -> list[ChatCompletionAgent]:
     """Return a list of agents for sequential orchestration."""

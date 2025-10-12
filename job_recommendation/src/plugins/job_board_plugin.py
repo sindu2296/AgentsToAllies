@@ -17,7 +17,7 @@ class JobBoardPlugin:
             "Returns a compact JSON string with title, company, location, url, description."
         ),
     )
-    def search_jobs(self, user_profile: str, limit: int = 1) -> str:
+    def search_jobs(self, user_profile: str, limit: int = 5) -> str:
         serpapi_key = os.getenv("SERPAPI_API_KEY")
         if not serpapi_key:
             raise ValueError("SERPAPI_API_KEY not set.")
@@ -47,7 +47,7 @@ class JobBoardPlugin:
                     "location": job.get("location"),
                     "description": desc,
                 })
-            print("Extracted jobs:", jobs_out)
+            #print("Extracted jobs:", jobs_out)
             return json.dumps(jobs_out)
         except Exception as e:
             return json.dumps({"error": str(e)})
