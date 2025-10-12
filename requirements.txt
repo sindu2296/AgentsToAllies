@@ -1,3 +1,5 @@
 semantic_kernel
 openai
 requests
+agent-framework
+azure-identity

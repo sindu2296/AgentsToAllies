@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+from typing import List, Dict, Any
 from dotenv import load_dotenv
 from semantic_kernel.functions import kernel_function
 

@@ -2,26 +2,24 @@ import asyncio
 
 from config import build_kernel
 from plugins.news_plugin import NewsPlugin
-from orchestration.sequential_orchestrator import SequentialNewsOrchestrator
+from orchestration.concurrent_orchestrator import ConcurrentNewsOrchestrator
 
 async def main():
     """
-    Sequential News Orchestrator Demo
+    Concurrent News Orchestrator Demo
     
-    This demonstrates processing news categories one-by-one in sequence.
-    Good for: predictable, ordered processing
+    This demonstrates processing news categories in parallel for better performance.
+    Good for: fast, efficient processing when dealing with multiple categories
     """
     kernel = build_kernel()
     kernel.add_plugin(NewsPlugin(), plugin_name="news")
 
-    # Create the orchestrator
-    orchestrator = SequentialNewsOrchestrator(kernel=kernel)
+    orchestrator = ConcurrentNewsOrchestrator(kernel)
 
-    # Example queries that span multiple categories
     queries = [
-        "What's happening in tech and business today?",
-        "Show me sports and health news updates",
-        "Give me science and tech innovation news"
+        "Round up AI chip and cloud infra news",
+        "What happened in sports and health this morning?",
+        "Give me business and tech headlines about big tech",
     ]
 
     try:
