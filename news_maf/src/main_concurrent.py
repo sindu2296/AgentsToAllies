@@ -20,6 +20,11 @@ logging.basicConfig(
     format='%(levelname)s: %(message)s',
     force=True
 )
+
+# Suppress verbose HTTP request logs from Azure OpenAI client
+logging.getLogger('httpx').setLevel(logging.WARNING)
+logging.getLogger('openai').setLevel(logging.WARNING)
+logging.getLogger('azure').setLevel(logging.WARNING)
 # ============================================================================
 
 

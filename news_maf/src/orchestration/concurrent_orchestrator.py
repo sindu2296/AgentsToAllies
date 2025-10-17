@@ -337,6 +337,18 @@ class ConcurrentNewsOrchestrator:
         Returns:
             List of article dictionaries
         """
+        # Strip markdown code fences if present
+        response_text = response_text.strip()
+        if response_text.startswith("```"):
+            lines = response_text.split("\n")
+            # Remove first line (```json or ```) and last line (```)
+            if lines[-1].strip() == "```":
+                lines = lines[1:-1]
+            else:
+                lines = lines[1:]
+            response_text = "\n".join(lines).strip()
+            logger.info(f"[{category.upper()}] Stripped markdown code fences")
+        
         try:
             payload = json.loads(response_text)
         except json.JSONDecodeError as e:
