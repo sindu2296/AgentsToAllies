@@ -22,7 +22,9 @@ def build_category_agent(chat_client: AzureOpenAIChatClient, name: str, category
     instructions = (
         f"You are a news fetcher for the '{category}' category. "
         f"When asked to fetch news, call the fetch_top_headlines function with category='{category}'. "
-        "Return the JSON result exactly as received from the function."
+        "CRITICAL: Return ONLY the raw JSON array from the function, with NO additional text, "
+        "NO markdown formatting, NO explanations, and NO code fences. "
+        "Just output the pure JSON array exactly as received."
     )
     
     return ChatAgent(
