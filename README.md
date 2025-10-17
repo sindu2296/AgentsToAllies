@@ -40,6 +40,23 @@ This session is built for technologists who want to understand how multi-agent s
    pip install -r requirements.txt
    ```
 
+5. Create .env file at the root folder and add this 
+    ```
+    AZURE_OPENAI_API_KEY= "<your_api_key>"
+    AZURE_OPENAI_ENDPOINT="<your_openai_endpoint>"
+    MODEL_NAME="<your_model_name>"
+    AI_FOUNDRY_AZURE_OPENAI_API_KEY="<your_api_key>"
+    NEWSAPI_API_KEY="<news_api_key>"
+    AZURE_OPENAI_CHAT_DEPLOYMENT_NAME="<your_model_name>"
+    AZURE_AI_PROJECT_ENDPOINT="<your_azureaiproject_endpoint>"
+    AZURE_AI_MODEL_DEPLOYMENT_NAME="<your_model_name>"
+    SERPAPI_API_KEY="<your_serp_api>"
+    ```
+6. Get SERPAPI_API_KEY by signing up to https://serpapi.com/. Register with the email and phone-number to recieve a unique api key.
+   Update the SERPAPI_API_KEY in the .env file with key obtained
+
+7. Get the NEWSAPI_API_KEY 
+
 ## Sample Projects
 
 ### 1. Azure OpenAI Chat Sample
