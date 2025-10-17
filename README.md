@@ -52,6 +52,10 @@ This session is built for technologists who want to understand how multi-agent s
     AZURE_AI_MODEL_DEPLOYMENT_NAME="<your_model_name>"
     SERPAPI_API_KEY="<your_serp_api>"
     ```
+6. Get SERPAPI_API_KEY by signing up to https://serpapi.com/. Register with the email and phone-number to recieve a unique api key.
+   Update the SERPAPI_API_KEY in the .env file with key obtained
+
+7. Get the NEWSAPI_API_KEY 
 
 ## Sample Projects
 
