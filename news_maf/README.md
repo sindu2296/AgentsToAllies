@@ -1,14 +1,23 @@
 # News Processing with Microsoft Agent Framework (MAF)
 
-This project demonstrates news processing using **Microsoft Agent Framework** alongside the Semantic Kernel implementation. Both frameworks implement the same news aggregation system, allowing for direct comparison.
+This project demonstrates news processing using **Microsoft Agent Framework** with proper workflow-based orchestration. It showcases both sequential and concurrent patterns using MAF's official workflow APIs.
 
 ## 🎯 Overview
 
 The Microsoft Agent Framework implementation uses:
 - **ChatAgent**: For creating AI agents with Azure OpenAI
 - **Function Tools**: For agent capabilities (fetching news)
-- **asyncio.gather()**: For concurrent execution
+- **ConcurrentBuilder Workflow**: For official concurrent orchestration
+- **Structured Logging**: For easy debugging and learning
 - **Azure CLI Authentication**: For secure credential management
+
+### Why Workflows?
+
+MAF provides official workflow patterns for orchestration instead of manual `asyncio.gather()`:
+- **ConcurrentBuilder**: Fan-out to multiple agents in parallel, then aggregate results
+- **Type-safe**: Better error handling and state management
+- **Maintainable**: Clear separation of concerns
+- **Observable**: Built-in tracing and monitoring support
 
 ## 📁 Project Structure
 
@@ -20,15 +29,15 @@ news_maf/
 │   │   ├── category_agent.py     # Fetches news for a category
 │   │   └── summarizer_agent.py   # Creates executive summaries
 │   ├── orchestration/
-│   │   ├── sequential_orchestrator.py   # Sequential processing
-│   │   └── concurrent_orchestrator.py   # Parallel processing
+│   │   ├── sequential_orchestrator.py   # Simple one-by-one processing
+│   │   └── concurrent_orchestrator.py   # Workflow-based parallel processing
 │   ├── plugins/
 │   │   └── news_plugin.py        # NewsAPI integration as function tool
 │   ├── utils/
 │   │   └── dedup.py              # Article deduplication
 │   ├── config.py                 # Azure OpenAI client setup
 │   ├── main_sequential.py        # Sequential demo
-│   └── main_concurrent.py        # Concurrent demo
+│   └── main_concurrent.py        # Concurrent workflow demo
 └── README.md
 ```
 
@@ -54,6 +63,25 @@ AI_FOUNDRY_AZURE_OPENAI_API_KEY=your_api_key  # Optional with Azure CLI auth
 NEWSAPI_API_KEY=your_newsapi_key
 ```
 
+### Enable Logging (Highly Recommended)
+
+To see detailed logs of what's happening, add this to the top of `main_sequential.py` or `main_concurrent.py`:
+
+```python
+import logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+```
+
+This will show you:
+- `[ROUTING]` - Which categories were selected
+- `[FETCHING]` - Progress fetching from each category
+- `[DEDUP]` - Deduplication results
+- `[SUMMARIZING]` - Summary generation
+- `[WORKFLOW]` - Workflow execution steps (concurrent mode)
+
 ### Running the Examples
 
 **Sequential Processing:**
@@ -62,7 +90,7 @@ cd news_maf/src
 python main_sequential.py
 ```
 
-**Concurrent Processing:**
+**Concurrent Processing (with Workflows):**
 ```bash
 cd news_maf/src
 python main_concurrent.py
@@ -70,48 +98,86 @@ python main_concurrent.py
 
 ## 🏗️ Architecture
 
-### Agent Flow
+### Workflow Flow (Concurrent Mode)
 
-```
+```text
 User Query
     ↓
 ┌─────────────────┐
-│  Router Agent   │  ← ChatAgent determines categories
+│  Router Agent   │  ← Determines categories
 └─────────────────┘
     ↓
 ┌──────────────────────────────────────┐
-│  Sequential or Concurrent Strategy   │
+│   ConcurrentBuilder Workflow         │
+│   ┌────────────────────────────┐     │
+│   │  Dispatcher (auto-created) │     │
+│   └────────────────────────────┘     │
+│              ↓                        │
+│   ┌─────────────────────────────┐    │
+│   │  Fan-out to Participants    │    │
+│   │  • technology_agent         │    │
+│   │  • sports_agent (parallel)  │    │
+│   │  • business_agent           │    │
+│   └─────────────────────────────┘    │
+│              ↓                        │
+│   ┌─────────────────────────────┐    │
+│   │  Aggregator Function        │    │
+│   │  • Collect all results      │    │
+│   │  • Deduplicate articles     │    │
+│   │  • Call summarizer          │    │
+│   └─────────────────────────────┘    │
 └──────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│  Category Agents (ChatAgent + tools)    │
-│  • technology_agent                     │
-│  • sports_agent                         │
-│  • business_agent                       │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────┐
-│  Deduplication  │
-└─────────────────┘
-    ↓
-┌─────────────────┐
-│ Summarizer Agent│  ← ChatAgent creates executive brief
-└─────────────────┘
     ↓
 Final Summary
 ```
 
 ### Key Components
 
-#### 1. **ChatAgent (agent_framework)**
+#### 1. **ConcurrentBuilder Workflow (Concurrent Mode)**
+
+The official MAF pattern for parallel execution:
+
+```python
+from agent_framework import ConcurrentBuilder
+
+# Define aggregator function
+async def aggregate_results(results):
+    # Process results from all agents
+    return final_output
+
+# Build workflow
+workflow = (
+    ConcurrentBuilder()
+    .participants([agent1, agent2, agent3])  # Agents to run in parallel
+    .with_aggregator(aggregate_results)       # How to combine results
+    .build()
+)
+
+# Run workflow
+result = await workflow.run(input_message)
+```
+
+**Why use workflows?**
+
+- ✅ Official MAF pattern (not manual asyncio)
+- ✅ Better error handling and state management
+- ✅ Built-in observability and tracing
+- ✅ Type-safe aggregation of results
+- ✅ Easier to test and maintain
+
+#### 2. **ChatAgent (agent_framework)**
+
 The core agent type in MAF that provides:
+
 - Instructions-based behavior
 - Function tool integration
 - Async run() method for execution
 - Built-in conversation management
 
-#### 2. **Function Tools**
+#### 3. **Function Tools**
+
 MAF agents use Python functions directly as tools:
+
 ```python
 def fetch_top_headlines(category: str, limit: int = 6) -> str:
     """Fetch news from NewsAPI"""
@@ -124,24 +190,28 @@ agent = ChatAgent(
 )
 ```
 
-#### 3. **AzureOpenAIChatClient**
-Client for connecting to Azure OpenAI:
-```python
-from agent_framework.azure import AzureOpenAIChatClient
-from azure.identity import AzureCliCredential
+#### 4. **Logging for Learning**
 
-client = AzureOpenAIChatClient(
-    credential=AzureCliCredential(),
-    endpoint=endpoint,
-    model_id=deployment
-)
+Both orchestrators use Python's logging module:
+
+```python
+import logging
+logger = logging.getLogger(__name__)
+
+# Throughout the code
+logger.info("[ROUTING] Processing query: {user_query}")
+logger.info(f"[FETCHING] Category: {category}")
+logger.info(f"[DEDUP] {count} unique articles")
 ```
 
-#### 4. **Agent Invocation**
-Simple async pattern:
+Enable it in your main file to follow execution:
+
 ```python
-result = await agent.run("Your prompt here")
-response_text = result.text
+import logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 ```
 
 ## 🆚 MAF vs Semantic Kernel Comparison
@@ -151,102 +221,86 @@ response_text = result.text
 | **Agent Type** | `ChatAgent` | `ChatCompletionAgent` |
 | **Function Tools** | Direct Python functions | `@kernel_function` decorators |
 | **Invocation** | `await agent.run(prompt)` | `async for msg in agent.invoke(messages)` |
-| **Orchestration** | Manual with `asyncio.gather()` | Built-in `ConcurrentOrchestration` |
+| **Orchestration** | `ConcurrentBuilder` workflows | Built-in orchestrator helpers |
 | **Setup Complexity** | Simpler - fewer concepts | More concepts (kernel, plugins, etc.) |
 | **Function Calling** | Automatic with `tools=[...]` | Requires `FunctionChoiceBehavior.Auto()` |
 | **Authentication** | `AzureCliCredential` | `AsyncAzureOpenAI` client |
 | **Learning Curve** | Gentler for beginners | Steeper but more powerful |
+| **Modularity** | Methods and functions | Kernel + plugin architecture |
 
-### Code Comparison
+### Code Comparison: Concurrent Execution
 
-**MAF:**
+**MAF (Workflow-based):**
+
 ```python
-# Simple and direct
-agent = ChatAgent(
-    chat_client=client,
-    instructions="Fetch tech news",
-    tools=[fetch_news_function]
+from agent_framework import ConcurrentBuilder
+
+# Define how to combine results
+async def aggregate(results):
+    return combine_all(results)
+
+# Build and run workflow
+workflow = (
+    ConcurrentBuilder()
+    .participants([agent1, agent2, agent3])
+    .with_aggregator(aggregate)
+    .build()
 )
-result = await agent.run("Go")
-print(result.text)
+result = await workflow.run("query")
 ```
 
 **Semantic Kernel:**
+
 ```python
-# More structured but more setup
-kernel = Kernel()
-kernel.add_service(chat_completion)
-kernel.add_plugin(NewsPlugin(), "news")
+from semantic_kernel.agents.group_chat import ConcurrentOrchestrator
 
-settings = kernel.get_prompt_execution_settings_from_service_id()
-settings.function_choice_behavior = FunctionChoiceBehavior.Auto()
-
-agent = ChatCompletionAgent(
-    instructions="Fetch tech news",
-    kernel=kernel,
-    arguments=KernelArguments(settings=settings)
+orchestrator = ConcurrentOrchestrator(
+    agents=[agent1, agent2, agent3]
 )
 
-async for msg in agent.invoke(messages="Go"):
-    print(msg.content)
+async for message in orchestrator.invoke("query"):
+    print(message.content)
 ```
 
-## ✨ MAF Features Used
+**Key Difference:** MAF uses explicit workflow builders with clear aggregation logic, while SK provides higher-level orchestrator classes. Both are official patterns (not manual asyncio).
 
-### 1. **Simple Agent Creation**
-```python
-agent = ChatAgent(
-    chat_client=client,
-    instructions="You are a helpful assistant",
-    name="helper",
-    tools=[my_function]  # Optional function tools
-)
-```
+## 📚 Understanding the Code Structure
 
-### 2. **Straightforward Execution**
-```python
-result = await agent.run("Tell me a joke")
-print(result.text)  # Direct access to response
-```
+### Modular Design Principles
 
-### 3. **Function Tools Integration**
-```python
-def get_weather(city: str) -> str:
-    """Get weather for a city"""
-    return f"Sunny in {city}"
+Both orchestrators follow these principles for beginners:
 
-agent = ChatAgent(
-    chat_client=client,
-    instructions="You can check weather",
-    tools=[get_weather]
-)
+1. **Small, focused methods** - Each method does one thing
+   - `_route_query()` - Just routing
+   - `_fetch_articles_sequentially()` - Just fetching
+   - `_create_summary()` - Just summarizing
 
-result = await agent.run("What's the weather in Seattle?")
-# Agent automatically calls get_weather("Seattle")
-```
+2. **Descriptive names** - Method names explain what they do
+   - Not: `process()`
+   - But: `_aggregate_and_summarize()`
 
-### 4. **Concurrent Execution**
-```python
-# Parallel agent execution using asyncio
-agents = [agent1, agent2, agent3]
-results = await asyncio.gather(*[agent.run(query) for agent in agents])
-```
+3. **Logging at every step** - Follow execution in real-time
+   - `logger.info("[ROUTING] ...")`
+   - `logger.info("[FETCHING] ...")`
+   - `logger.error("[ERROR] ...")`
 
-## 🎓 When to Use MAF vs SK
+4. **Type hints** - Know what goes in and out
+   ```python
+   async def _route_query(self, user_query: str) -> list[str]:
+   ```
 
-### Use Microsoft Agent Framework When:
-- ✅ You want simpler, more direct agent code
-- ✅ You're building straightforward agentic applications
-- ✅ You prefer minimal abstractions
-- ✅ You're new to agent frameworks
-- ✅ You need quick prototypes
-
-### Use Semantic Kernel When:
-- ✅ You need complex multi-agent orchestration patterns
-- ✅ You want built-in orchestration (Sequential, Concurrent, Handoff, etc.)
-- ✅ You're building enterprise-scale agentic systems
-- ✅ You need advanced plugin ecosystems
-- ✅ You want fine-grained control over agent behavior
+5. **Docstrings** - Understand purpose and usage
+   ```python
+   """
+   Use router agent to determine which news categories to fetch.
+   
+   Args:
+       user_query: User's natural language query
+       
+   Returns:
+       List of category names
+   """
+   ```
 
 ## 📊 Example Queries
 
@@ -262,51 +316,122 @@ Try these with either sequential or concurrent orchestrators:
    - "What happened in sports this morning?"
    - "Business headlines about big tech"
 
-## 🔧 Customization
+## 🔧 Customization Guide
 
-### Add a New Category Agent
+### Add a New Category
+
+1. No code changes needed! Just use a different category name:
+
 ```python
-new_agent = build_category_agent(chat_client, "crypto_agent", "cryptocurrency")
+orchestrator = ConcurrentNewsOrchestrator(chat_client)
+result = await orchestrator.run("What's new in cryptocurrency?")
 ```
 
-### Change Summary Format
-Edit `summarizer_agent.py`:
+The router agent will detect "cryptocurrency" and fetch accordingly.
+
+### Modify Summary Style
+
+Edit `agents/summarizer_agent.py`:
+
 ```python
-instructions = "Create a 3-bullet summary with..."
+instructions = (
+    "You are an executive news summarizer. "
+    "Create a 3-bullet summary..."  # Change to your preference
+)
 ```
 
-### Add Error Handling
+### Add Error Recovery
+
+Both orchestrators already handle errors gracefully:
+
+- Empty responses logged and skipped
+- JSON parse errors caught and logged
+- Category failures don't stop other categories
+- Summarizer failures return error messages
+
+### Extend Logging
+
+Add more detail by increasing log level:
+
 ```python
-try:
-    result = await agent.run(query)
-except Exception as e:
-    print(f"Error: {e}")
+logging.basicConfig(level=logging.DEBUG)  # More verbose
+```
+
+Or customize format:
+
+```python
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 ```
 
 ## 🐛 Troubleshooting
 
-**Import errors for agent_framework:**
-- Run: `pip install agent-framework azure-identity`
-- Ensure you're in the correct virtual environment
+**"ModuleNotFoundError: No module named 'agent_framework'"**
 
-**Authentication errors:**
-- Run `az login` to authenticate with Azure CLI
-- Verify you have access to the Azure OpenAI resource
+- Install: `pip install agent-framework azure-identity`
+- Verify correct virtual environment is active
 
-**No articles found:**
-- Check NEWSAPI_API_KEY in .env
-- Free tier has rate limits
+**"Authentication error" or 401/403**
+
+- Run `az login` to authenticate
+- Check `az account show` for current subscription
+- Verify AZURE_OPENAI_ENDPOINT in .env
+
+**"No articles found" or empty results**
+
+- Verify NEWSAPI_API_KEY in .env
+- Check NewsAPI rate limits (500 requests/day free tier)
+- Enable logging to see which categories failed
+
+**Logging not showing**
+
+- Add this at the start of main file:
+  ```python
+  import logging
+  logging.basicConfig(level=logging.INFO)
+  ```
+
+**Workflow errors**
+
+- Check agent names are unique (e.g., "tech_agent", "sports_agent")
+- Verify all agents return proper AgentRunResponse objects
+- Enable DEBUG logging to see workflow internals
 
 ## 📚 Learn More
 
-- [Microsoft Agent Framework Documentation](https://learn.microsoft.com/en-us/agent-framework/)
+### Official Documentation
+
+- [Microsoft Agent Framework Docs](https://learn.microsoft.com/en-us/agent-framework/)
+- [Concurrent Workflows Guide](https://learn.microsoft.com/en-us/agent-framework/user-guide/workflows/orchestrations/concurrent)
 - [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/ai-services/openai/)
-- [Agent Framework GitHub](https://github.com/microsoft/agent-framework)
+
+### Code Structure
+
+- `agents/` - Individual agent builders (router, category, summarizer)
+- `orchestration/` - Coordination logic (sequential vs concurrent)
+- `plugins/` - External integrations (NewsAPI)
+- `utils/` - Shared utilities (deduplication)
+
+### Key Learnings
+
+1. **Workflows over asyncio.gather()** - Use official patterns for better maintainability
+2. **Logging is essential** - Makes debugging and learning much easier
+3. **Small methods** - Easier to understand, test, and modify
+4. **Type hints** - Documents expectations and catches errors early
+5. **Docstrings** - Explain the "why" not just the "what"
 
 ## 🎯 Next Steps
 
-1. ✅ Run both sequential and concurrent demos
-2. ✅ Compare with Semantic Kernel implementation
-3. ✅ Modify agent instructions
-4. ✅ Add custom function tools
-5. ✅ Experiment with different orchestration patterns
+1. ✅ Enable logging and run both demos
+2. ✅ Read through orchestrator code with logging output side-by-side
+3. ✅ Try modifying agent instructions
+4. ✅ Experiment with different news categories
+5. ✅ Compare execution flow between sequential and concurrent modes
+6. ✅ Explore the workflow pattern in `concurrent_orchestrator.py`
+
+---
+
+**Tip for Beginners:** Start with `sequential_orchestrator.py` - it's simpler and easier to follow. Once you understand that, the concurrent workflow pattern will make more sense!

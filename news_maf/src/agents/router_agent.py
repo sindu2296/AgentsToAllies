@@ -35,12 +35,34 @@ async def route_categories(router: ChatAgent, query: str) -> List[str]:
     Returns:
         List of category names to fetch from
     """
+    import logging
+    logger = logging.getLogger(__name__)
+    
     result = await router.run(query)
     response = result.text
+    
+    logger.info(f"[ROUTER] Raw response: {response}")
+    
+    # Strip markdown code fences if present
+    response = response.strip()
+    if response.startswith("```"):
+        lines = response.split("\n")
+        # Remove first line (```json or ```) and last line (```)
+        if lines[-1].strip() == "```":
+            lines = lines[1:-1]
+        else:
+            lines = lines[1:]
+        response = "\n".join(lines).strip()
+        logger.info(f"[ROUTER] Cleaned response: {response}")
     
     try:
         data = json.loads(response)
         targets = data.get("targets", [])
-        return [t for t in targets if t in CATEGORIES] or ["general"]
-    except Exception:
+        logger.info(f"[ROUTER] Parsed targets: {targets}")
+        filtered = [t for t in targets if t in CATEGORIES]
+        logger.info(f"[ROUTER] Filtered targets: {filtered}")
+        return filtered or ["general"]
+    except Exception as e:
+        logger.error(f"[ROUTER] Failed to parse response: {e}")
+        logger.error(f"[ROUTER] Attempted to parse: {response[:200]}")
         return ["general"]
