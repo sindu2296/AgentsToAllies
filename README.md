@@ -33,19 +33,22 @@ This session is built for technologists who want to understand how multi-agent s
 5. Create .env file at the root folder and add this 
     ```
     AZURE_OPENAI_API_KEY= "<your_api_key>"
-    AZURE_OPENAI_ENDPOINT="<your_openai_endpoint>"
+    AZURE_OPENAI_ENDPOINT="<your_endpoint>"
     MODEL_NAME="<your_model_name>"
     AI_FOUNDRY_AZURE_OPENAI_API_KEY="<your_api_key>"
     NEWSAPI_API_KEY="<news_api_key>"
     AZURE_OPENAI_CHAT_DEPLOYMENT_NAME="<your_model_name>"
-    AZURE_AI_PROJECT_ENDPOINT="<your_azureaiproject_endpoint>"
+    AZURE_AI_PROJECT_ENDPOINT="<your_endpoint>"
     AZURE_AI_MODEL_DEPLOYMENT_NAME="<your_model_name>"
     SERPAPI_API_KEY="<your_serp_api>"
     ```
-6. Get SERPAPI_API_KEY by signing up to https://serpapi.com/. Register with the email and phone-number to recieve a unique api key.
+   
+6. **📋 For Azure OpenAI credentials:** Refer to [AZURE_AIFOUNDRY_SETUP.md](./AZURE_AIFOUNDRY_SETUP.md) for step-by-step instructions on how to set up Azure AI Foundry and get your API key and endpoint values.
+
+7. Get SERPAPI_API_KEY by signing up to https://serpapi.com/. Register with the email and phone-number to recieve a unique api key.
    Update the SERPAPI_API_KEY in the .env file with key obtained
 
-7. Get the NEWSAPI_API_KEY from https://newsapi.org/. Register with email and password to get the API key.
+8. Get the NEWSAPI_API_KEY from https://newsapi.org/. Register with email and password to get the API key.
    Update the NEWSAPI_API_KEY in the .env file with key obtained
 
 ## Sample Projects
