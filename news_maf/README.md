@@ -3,14 +3,67 @@
 News gathering and summarization using Microsoft Agent Framework.
 
 ---
-## How It Works
 
-- Router agent analyzes your query and selects news categories
-- Category agents fetch articles in parallel
-- Deduplication removes duplicates
-- Summarizer agent creates the final summary
+## 🚀 Quick Start - Try the Streamlit UI
+
+### Launch the Interactive Web UI
+```bash
+streamlit run app.py
+```
+
+**The easiest way to get started!** Open your browser at `http://localhost:8501` and:
+1. Enter any news query (e.g., "Latest AI breakthroughs", "Tech industry updates")
+2. Watch the 4-stage workflow execute in real-time with visual indicators
+3. Download results as text files
+
+**No configuration needed** - Just run the command above!
 
 ---
+
+## How It Works
+
+- **Router Agent** analyzes your query and selects relevant news categories
+- **Category Agents** fetch articles from multiple sources in parallel
+- **Deduplication** removes duplicate articles for cleaner data
+- **Summarizer Agent** creates an executive summary of all findings
+
+---
+
+## Workflow Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Stage 1: Query Analysis                                     │
+│   Input: User's natural language query                      │
+│   Component: Router Agent                                   │
+│   Output: List of relevant categories                       │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│ Stage 2: Parallel News Gathering (Concurrent Workflow)      │
+│   Input: Categories                                         │
+│   Components: Category Agents (Business, Tech, etc.)        │
+│   Execution: Parallel via ConcurrentBuilder                 │
+│   Output: Raw articles from all sources                     │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│ Stage 3: Data Consolidation                                 │
+│   Input: Raw articles                                       │
+│   Operation: Deduplication logic                            │
+│   Output: Unique articles                                   │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│ Stage 4: Summary Generation                                 │
+│   Input: Unique articles                                    │
+│   Component: Summarizer Agent                               │
+│   Output: Executive brief                                   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
 ## References
 
 - [Microsoft Agent Framework Documentation](https://learn.microsoft.com/en-us/agent-framework/)

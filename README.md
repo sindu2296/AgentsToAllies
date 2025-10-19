@@ -72,16 +72,32 @@ Located in the `news` and `news_maf` folders, these samples show **two different
 - Sequential: Multiple agents working one after another
 - Concurrent: Parallel processing with `ConcurrentBuilder`
 - Uses: `ChatAgent`, function tools, simpler setup
+- Run with:
+  ```
+  cd news_maf
+  streamlit run app.py
+  ```
 
 Both implementations provide the same functionality but with different patterns and abstractions.
 
 
 ### 4. Job Recommendation with Multi Agents
-Located in the `job_recommendation` folder, this sample shows different approaches to job recommendation using multiple agents:
+Located in the `job_recommendation` and `job_recommendation_maf` folders, these samples show different approaches to job recommendation using multiple agents:
+
+#### Semantic Kernel Implementation (`job_recommendation/`)
 - Basic: Simple sequential processing with one agent
 - Sequential: Multiple agents working one after another (extract, recommend, summarize)
 - Concurrent: Parallel processing with multiple agents for efficiency
 
-Agents use SerpAPI to fetch jobs, recommend relevant ones, and summarize results. 
+#### Microsoft Agent Framework Implementation (`job_recommendation_maf/`)
+- Sequential: Multiple agents working one after another (extract, recommend, summarize)
+- Uses: `ChatAgent`, SerpAPI integration
+- Run with:
+  ```
+  cd job_recommendation_maf
+  streamlit run app.py
+  ```
 
-Please refer to README file for in the respetive folders for more details.
+Agents use SerpAPI to fetch jobs, recommend relevant ones, and summarize results.
+
+Please refer to README file in the respective folders for more details.

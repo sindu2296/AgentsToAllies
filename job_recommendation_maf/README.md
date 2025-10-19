@@ -2,6 +2,25 @@
 
 This project demonstrates how to build a modular job recommendation system using **Microsoft Agent Framework (MAF)** with multi-agent sequential orchestration.
 
+---
+
+## 🚀 Quick Start - Try the Streamlit UI
+
+### Launch the Interactive Web UI
+```bash
+streamlit run app.py
+```
+
+**The easiest way to get started!** Open your browser at `http://localhost:8501` and:
+1. Enter your job profile (e.g., "Python developer with 3 years AWS experience")
+2. Watch the 3-stage workflow execute in real-time
+3. Get personalized job recommendations with match explanations
+4. Download results as text files
+
+**No configuration needed** - Just run the command above!
+
+---
+
 ## Overview
 
 This implementation showcases:
@@ -64,16 +83,7 @@ Final Output (Complete Conversation)
 
 **Key Feature**: Each agent sees the full conversation history and adds their response, building a complete dialogue through the pipeline.
 
-## Prerequisites
-
-1. Python 3.9+ and pip installed
-2. Required environment variables in a `.env` file:
-   ```
-   AZURE_OPENAI_ENDPOINT=your_azure_endpoint
-   MODEL_NAME=your_model_name
-   AI_FOUNDRY_AZURE_OPENAI_API_KEY=your_api_key
-   SERPAPI_API_KEY=your_serpapi_key
-   ```
+```
 
 ## Setup
 
