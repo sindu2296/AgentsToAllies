@@ -18,7 +18,7 @@ async def main():
 
     # Example user profiles
     user_profiles = [
-        "software engineer with Python and Azure cloud experience",
+        "software engineer with Python experience",
         # "data scientist with machine learning and AI background",
         # "full stack developer with React and Node.js skills",
     ]
