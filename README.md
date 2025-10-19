@@ -6,23 +6,13 @@ From Agents to Allies: Empowering Technologists with Multi-Agent AI Workflows
 ### Abstract: 
 This session is built for technologists who want to understand how multi-agent systems work, build them from the ground up, and be part of the rapidly growing ecosystem shaping their future. Instead of abstract concepts, we'll explore this shift through real-time demos and an honest, practical look at the tools and frameworks available today.
 
-## Prerequisites
-
-1. Python 3.9+ and pip installed
-2. Required environment variables in a `.env` file:
-   ```
-   AZURE_OPENAI_ENDPOINT=your_azure_endpoint
-   MODEL_NAME=your_model_name
-   AI_FOUNDRY_AZURE_OPENAI_API_KEY=your_api_key
-   NEWSAPI_API_KEY=your_newsapi_key
-   ```
 ## Setup
 
 1. Install/Use an IDE of your choice. We are using Visual Studio Code.
    Some of the IDE Installers: 
    Visual Studio Code: https://code.visualstudio.com/download
 
-2. Download and Install Latest Python from: https://www.python.org/downloads/
+2. Download and Install Python 3.13.9 from: https://www.python.org/downloads/
 
 3. Create and activate a Python virtual environment:
    Powershell command to Create:
@@ -55,7 +45,8 @@ This session is built for technologists who want to understand how multi-agent s
 6. Get SERPAPI_API_KEY by signing up to https://serpapi.com/. Register with the email and phone-number to recieve a unique api key.
    Update the SERPAPI_API_KEY in the .env file with key obtained
 
-7. Get the NEWSAPI_API_KEY 
+7. Get the NEWSAPI_API_KEY from https://newsapi.org/. Register with email and password to get the API key.
+   Update the NEWSAPI_API_KEY in the .env file with key obtained
 
 ## Sample Projects
 
@@ -79,13 +70,11 @@ Located in the `news` and `news_maf` folders, these samples show **two different
 
 #### Microsoft Agent Framework Implementation (`news_maf/`)
 - Sequential: Multiple agents working one after another
-- Concurrent: Parallel processing with `asyncio.gather()`
+- Concurrent: Parallel processing with `ConcurrentBuilder`
 - Uses: `ChatAgent`, function tools, simpler setup
-- Great for: Comparing agent frameworks, learning different approaches
 
 Both implementations provide the same functionality but with different patterns and abstractions.
 
-For detailed instructions on running each sample, check the README files in their respective folders.
 
 ### 4. Job Recommendation with Multi Agents
 Located in the `job_recommendation` folder, this sample shows different approaches to job recommendation using multiple agents:

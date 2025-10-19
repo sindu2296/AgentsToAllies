@@ -3,28 +3,6 @@
 News gathering and summarization using Microsoft Agent Framework.
 
 ---
-## Setup
-
-1. **Install dependencies**
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-2. **Configure environment**
-
-    Create a `.env` file:
-    ```env
-    AZURE_OPENAI_ENDPOINT=your_endpoint
-    MODEL_NAME=your_model_name
-    NEWSAPI_API_KEY=your_newsapi_key
-    ```
-
-3. **Run the demo**
-    ```bash
-    python src/main_workflow.py
-    ```
-
----
 ## How It Works
 
 - Router agent analyzes your query and selects news categories
