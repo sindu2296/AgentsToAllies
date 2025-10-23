@@ -124,7 +124,7 @@ SERPAPI_API_KEY="<your_serp_api>"
 
 #### 2. Get API Keys
 
-**📋 Azure OpenAI credentials:**  
+**Azure OpenAI credentials **: 
 Refer to [AZURE_AIFOUNDRY_SETUP.md](./AZURE_AIFOUNDRY_SETUP.md) for step-by-step instructions on how to set up Azure AI Foundry and get your API key and endpoint values.
 
 **SERPAPI_API_KEY:**  
@@ -142,11 +142,11 @@ Update the NEWSAPI_API_KEY in the .env file with the key obtained.
 ### 1. Azure OpenAI Chat Sample
 A basic example showing how to use Azure OpenAI chat completions API. Found in `AIFoundry_sample.py`.
 
-### 2. Semantic Kernel Plugin Sample
-Located in `semantickernel_sample.py`, this demonstrates how to:
-- Create and use Semantic Kernel plugins
-- Set up chat completion with Azure OpenAI
-- Handle interactive conversations using chat history
+### 2. Agent Framework Sample
+Located in `AgentFramework_sample.py`, this demonstrates how to:
+- Create and use Agent Framework agents with Azure OpenAI
+- Build simple agent-based solutions
+- Handle agent responses and execution
 
 ### 3. News Processing with Multiple Agents
 Located in the `news` and `news_maf` folders, these samples show **two different frameworks** for building the same multi-agent news system:
@@ -174,9 +174,7 @@ Both implementations provide the same functionality but with different patterns 
 Located in the `job_recommendation` and `job_recommendation_maf` folders, these samples show different approaches to job recommendation using multiple agents:
 
 #### Semantic Kernel Implementation (`job_recommendation/`)
-- Basic: Simple sequential processing with one agent
 - Sequential: Multiple agents working one after another (extract, recommend, summarize)
-- Concurrent: Parallel processing with multiple agents for efficiency
 
 #### Microsoft Agent Framework Implementation (`job_recommendation_maf/`)
 - Sequential: Multiple agents working one after another (extract, recommend, summarize)
