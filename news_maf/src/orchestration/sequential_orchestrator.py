@@ -1,14 +1,5 @@
 """
-Sequential news orchestrator using Microsoft Agent Framework.
-
-This module demonstrates a simple sequential processing pattern where each
-category agent is invoked one-by-one. This is easier to understand for beginners
-and useful when parallelism isn't needed or rate limits are a concern.
-
-Key concepts for beginners:
-- Sequential processing: One agent at a time, in order
-- Explicit control flow: Easy to follow and debug
-- Simple error handling: Can handle failures per category
+Sequential news orchestrator - agents run one-by-one.
 """
 import json
 import logging
@@ -16,12 +7,11 @@ from typing import Any
 
 from agent_framework.azure import AzureOpenAIChatClient
 
-from agents.router_agent import build_router_agent, route_categories
-from agents.category_agent import build_category_agent
+from agents.query_classifier_agent import build_query_classifier_agent, classify_query
+from agents.news_gatherer_agent import build_news_gatherer_agent
 from agents.summarizer_agent import build_summarizer_agent
 from utils.dedup import dedup_articles
 
-# Set up logging for better traceability
 logger = logging.getLogger(__name__)
 
 
@@ -42,7 +32,7 @@ class SequentialNewsOrchestrator:
     def __init__(self, chat_client: AzureOpenAIChatClient):
         """Initialize orchestrator with Azure OpenAI chat client."""
         self.chat_client = chat_client
-        self.router = build_router_agent(chat_client)
+        self.classifier = build_query_classifier_agent(chat_client)
         logger.info("Sequential orchestrator initialized")
 
     async def run(self, user_query: str) -> str:
@@ -81,7 +71,7 @@ class SequentialNewsOrchestrator:
 
     async def _route_query(self, user_query: str) -> list[str]:
         """
-        Use router agent to determine which news categories to fetch.
+        Use query classifier agent to determine which news categories to fetch.
         
         Args:
             user_query: User's natural language query
@@ -89,9 +79,10 @@ class SequentialNewsOrchestrator:
         Returns:
             List of category names (e.g., ['technology', 'business'])
         """
-        logger.info(f"[ROUTING] Processing query: {user_query}")
-        categories = await route_categories(self.router, user_query)
-        logger.info(f"[ROUTING] Selected categories: {categories}")
+        logger.info(f"[CLASSIFICATION] Processing query: {user_query}")
+        categories = await classify_query(self.classifier, user_query)
+        logger.info(f"[CLASSIFICATION] Selected categories: {categories}")
+        logger.info("")  # Blank line for readability
         return categories
 
     async def _fetch_articles_sequentially(self, categories: list[str]) -> list[dict[str, Any]]:
@@ -110,16 +101,17 @@ class SequentialNewsOrchestrator:
             logger.info(f"[FETCHING] Category: {category}")
             
             # Create agent for this specific category
-            category_agent = build_category_agent(
+            news_gatherer = build_news_gatherer_agent(
                 self.chat_client,
-                f"{category}_agent",
+                f"{category}_gatherer",
                 category
             )
             
             # Fetch articles for this category
-            articles = await self._fetch_category_articles(category_agent, category)
+            articles = await self._fetch_category_articles(news_gatherer, category)
             all_articles.extend(articles)
         
+        logger.info("")  # Blank line for readability
         return all_articles
 
     async def _fetch_category_articles(
@@ -127,84 +119,52 @@ class SequentialNewsOrchestrator:
         category_agent: Any,
         category: str
     ) -> list[dict[str, Any]]:
-        """
-        Fetch articles from a single category agent.
-        
-        Args:
-            category_agent: The ChatAgent for this category
-            category: Category name for logging
-            
-        Returns:
-            List of article dictionaries
-        """
+        """Fetch articles from a category agent."""
         try:
-            # Invoke the agent
             result = await category_agent.run(
                 "Fetch the latest news headlines for your assigned category"
             )
-            response_text = result.text
             
-            # Parse response
-            return self._parse_article_response(response_text, category)
+            # Agent returns tool result directly
+            response_text = result.text
+            if not response_text:
+                logger.warning(f"[{category.upper()}] Empty response")
+                return []
+            
+            articles = json.loads(response_text.strip())
+            if not isinstance(articles, list):
+                return []
+            
+            # Add category metadata
+            for article in articles:
+                if isinstance(article, dict):
+                    article.setdefault("category", category)
+            
+            logger.info(f"[{category.upper()}] Fetched {len(articles)} articles")
+            return articles
             
         except Exception as exc:
-            logger.error(f"[{category.upper()}] Failed to fetch: {exc}")
+            logger.error(f"[{category.upper()}] Failed: {exc}")
             return []
-
-    def _parse_article_response(self, response_text: str, category: str) -> list[dict[str, Any]]:
-        """
-        Parse JSON article response from category agent.
-        
-        Args:
-            response_text: JSON string from agent
-            category: Category name for logging
-            
-        Returns:
-            List of article dictionaries
-        """
-        try:
-            articles = json.loads(response_text)
-        except json.JSONDecodeError:
-            logger.error(f"[{category.upper()}] Failed to parse JSON response")
-            return []
-        
-        # Validate response is a list
-        if not isinstance(articles, list):
-            logger.warning(f"[{category.upper()}] Unexpected response type: {type(articles).__name__}")
-            return []
-        
-        # Add category metadata
-        for article in articles:
-            if isinstance(article, dict):
-                article.setdefault("category", category)
-        
-        logger.info(f"[{category.upper()}] Successfully fetched {len(articles)} articles")
-        return articles
 
     async def _create_summary(self, articles: list[dict[str, Any]]) -> str:
-        """
-        Create executive summary from articles using summarizer agent.
-        
-        Args:
-            articles: List of article dictionaries
-            
-        Returns:
-            Summary text
-        """
-        logger.info(f"[SUMMARIZING] Creating executive brief from {len(articles)} articles")
+        """Create executive summary."""
+        logger.info(f"[SUMMARIZING] Creating summary from {len(articles)} articles")
         
         summarizer = build_summarizer_agent(self.chat_client)
         articles_json = json.dumps(articles)
         
         try:
             result = await summarizer.run(articles_json)
-            summary_text = result.text
             
+            # Agent returns prose directly
+            summary_text = result.text
             if not summary_text:
-                logger.error("[SUMMARIZING] Summarizer produced no output")
+                logger.error("[SUMMARIZING] No output")
                 return "Summarizer produced no output."
             
-            logger.info("[SUMMARIZING] Summary created successfully")
+            logger.info("[SUMMARIZING] Complete")
+            logger.info("")
             return summary_text
             
         except Exception as exc:

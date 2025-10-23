@@ -1,14 +1,5 @@
 """
-Concurrent news orchestrator using Microsoft Agent Framework Workflows.
-
-This module demonstrates the official MAF workflow pattern using ConcurrentBuilder
-to fan-out work to multiple agents in parallel, then aggregate results.
-
-Key concepts for beginners:
-- ConcurrentBuilder: Creates a workflow that runs multiple agents in parallel
-- Participants: The agents that run concurrently
-- Aggregator: A function that combines results from all participants
-- Workflow.run(): Executes the workflow and returns results
+Concurrent news orchestrator - agents run in parallel via ConcurrentBuilder.
 """
 import json
 import logging
@@ -17,12 +8,11 @@ from typing import Any
 from agent_framework import ConcurrentBuilder
 from agent_framework.azure import AzureOpenAIChatClient
 
-from agents.router_agent import build_router_agent, route_categories
-from agents.category_agent import build_category_agent
+from agents.query_classifier_agent import build_query_classifier_agent, classify_query
+from agents.news_gatherer_agent import build_news_gatherer_agent
 from agents.summarizer_agent import build_summarizer_agent
 from utils.dedup import dedup_articles
 
-# Set up logging for better traceability
 logger = logging.getLogger(__name__)
 
 
@@ -43,7 +33,7 @@ class ConcurrentNewsOrchestrator:
     def __init__(self, chat_client: AzureOpenAIChatClient):
         """Initialize orchestrator with Azure OpenAI chat client."""
         self.chat_client = chat_client
-        self.router = build_router_agent(chat_client)
+        self.classifier = build_query_classifier_agent(chat_client)
         logger.info("Concurrent orchestrator initialized")
 
     async def run(self, user_query: str) -> str:
@@ -81,9 +71,10 @@ class ConcurrentNewsOrchestrator:
         Returns:
             List of category names (e.g., ['technology', 'business'])
         """
-        logger.info(f"[ROUTING] Processing query: {user_query}")
-        categories = await route_categories(self.router, user_query)
-        logger.info(f"[ROUTING] Selected categories: {categories}")
+        logger.info(f"[CLASSIFICATION] Processing query: {user_query}")
+        categories = await classify_query(self.classifier, user_query)
+        logger.info(f"[CLASSIFICATION] Selected categories: {categories}")
+        logger.info("")  # Blank line for readability
         return categories
 
     def _build_category_agents(self, categories: list[str]) -> list[Any]:
@@ -96,9 +87,9 @@ class ConcurrentNewsOrchestrator:
         Returns:
             List of configured ChatAgent instances
         """
-        logger.info(f"[AGENTS] Building {len(categories)} category agents")
+        logger.info(f"[AGENTS] Building {len(categories)} news gatherer agents")
         agents = [
-            build_category_agent(self.chat_client, f"{cat}_agent", cat)
+            build_news_gatherer_agent(self.chat_client, f"{cat}_gatherer", cat)
             for cat in categories
         ]
         return agents
@@ -169,6 +160,7 @@ class ConcurrentNewsOrchestrator:
         for output in reversed(outputs):
             if isinstance(output, str):
                 logger.info("[WORKFLOW] Workflow completed successfully")
+                logger.info("")  # Blank line for readability
                 return output
         
         logger.error("[WORKFLOW] No output produced by workflow")
@@ -203,20 +195,26 @@ class ConcurrentNewsOrchestrator:
             fetch_instruction = "Fetch the latest top headlines for your category."
             agent_result = await agent.run(fetch_instruction)
             
-            # Extract text from result
-            response_text = self._extract_agent_text(agent_result)
+            # Agent returns tool result directly
+            response_text = agent_result.text
             if not response_text:
                 logger.warning(f"[{categories[0].upper()}] Empty response")
                 return "No articles found."
             
             # Parse articles
-            articles = self._parse_article_response(response_text, categories[0])
-            if not articles:
+            articles = json.loads(response_text.strip())
+            if not isinstance(articles, list):
                 return "No articles found."
+            
+            # Add category metadata
+            for article in articles:
+                if isinstance(article, dict):
+                    article.setdefault("category", categories[0])
             
             # Deduplicate (though unlikely to have duplicates from single source)
             unique_articles = dedup_articles(articles)
             logger.info(f"[DEDUP] {len(unique_articles)} unique articles")
+            logger.info("")  # Blank line for readability
             
             # Summarize
             summary_text = await self._create_summary(unique_articles, summarizer)
@@ -273,122 +271,34 @@ class ConcurrentNewsOrchestrator:
         return f"{header}\n\n{summary_text}"
 
     def _extract_articles_from_results(self, results: list[Any]) -> list[dict[str, Any]]:
-        """
-        Extract and parse article data from workflow results.
-        
-        Args:
-            results: List of AgentExecutorResponse objects
-            
-        Returns:
-            List of article dictionaries
-        """
+        """Extract and parse article data from workflow results."""
         all_articles = []
         
         for result in results:
-            # Get category name from executor ID
             executor_id = getattr(result, "executor_id", "") or ""
             category = executor_id.removesuffix("_agent") if executor_id else "unknown"
             
-            # Extract text response from agent
-            response_text = self._extract_agent_text(result.agent_run_response)
-            
+            # Agent returns tool result directly
+            response_text = result.agent_run_response.text
             if not response_text:
                 logger.warning(f"[{category.upper()}] Empty response")
                 continue
             
-            # Parse JSON response
-            articles = self._parse_article_response(response_text, category)
-            all_articles.extend(articles)
+            try:
+                articles = json.loads(response_text.strip())
+                if isinstance(articles, list):
+                    for article in articles:
+                        if isinstance(article, dict):
+                            article.setdefault("category", category)
+                            all_articles.append(article)
+            except json.JSONDecodeError as e:
+                logger.warning(f"[{category.upper()}] JSON parse failed: {e}")
         
         return all_articles
 
-    @staticmethod
-    def _extract_agent_text(agent_response) -> str | None:
-        """
-        Extract text content from agent response.
-        
-        Handles both message-based and direct text responses.
-        
-        Args:
-            agent_response: AgentRunResponse object
-            
-        Returns:
-            Extracted text or None
-        """
-        # Try to get from messages first
-        messages = list(getattr(agent_response, "messages", []) or [])
-        if messages:
-            for message in reversed(messages):
-                text = getattr(message, "text", None)
-                if text:
-                    return text
-        
-        # Fallback to direct text attribute
-        return getattr(agent_response, "text", None)
-
-    def _parse_article_response(self, response_text: str, category: str) -> list[dict[str, Any]]:
-        """
-        Parse JSON article response from category agent.
-        
-        Args:
-            response_text: JSON string from agent
-            category: Category name for logging
-            
-        Returns:
-            List of article dictionaries
-        """
-        # Strip markdown code fences if present
-        response_text = response_text.strip()
-        if response_text.startswith("```"):
-            lines = response_text.split("\n")
-            # Remove first line (```json or ```) and last line (```)
-            if lines[-1].strip() == "```":
-                lines = lines[1:-1]
-            else:
-                lines = lines[1:]
-            response_text = "\n".join(lines).strip()
-            logger.info(f"[{category.upper()}] Stripped markdown code fences")
-        
-        try:
-            payload = json.loads(response_text)
-        except json.JSONDecodeError as e:
-            logger.error(f"[{category.upper()}] Failed to parse JSON response")
-            logger.error(f"[{category.upper()}] Response text: {response_text[:500]}")
-            logger.error(f"[{category.upper()}] JSON error: {e}")
-            return []
-        
-        # Handle error responses
-        if isinstance(payload, dict) and payload.get("error"):
-            logger.error(f"[{category.upper()}] Error: {payload['error']}")
-            return []
-        
-        # Validate list response
-        if not isinstance(payload, list):
-            logger.warning(f"[{category.upper()}] Unexpected payload type: {type(payload).__name__}")
-            return []
-        
-        # Add category metadata to articles
-        articles = []
-        for article in payload:
-            if isinstance(article, dict):
-                article.setdefault("category", category)
-                articles.append(article)
-        
-        logger.info(f"[{category.upper()}] Successfully fetched {len(articles)} articles")
-        return articles
-
     async def _create_summary(self, articles: list[dict[str, Any]], summarizer: Any) -> str:
-        """
-        Create executive summary from articles using summarizer agent.
-        
-        Args:
-            articles: List of article dictionaries
-            summarizer: Summarizer agent instance
-            
-        Returns:
-            Summary text
-        """
-        logger.info(f"[SUMMARIZING] Creating executive brief from {len(articles)} articles")
+        """Create executive summary."""
+        logger.info(f"[SUMMARIZING] Creating summary from {len(articles)} articles")
         
         summary_payload = json.dumps(articles)
         
@@ -396,12 +306,14 @@ class ConcurrentNewsOrchestrator:
             summary_result = await summarizer.run(summary_payload)
         except Exception as exc:
             logger.error(f"[SUMMARIZING] Failed: {exc}")
-            return f"Failed to summarize results: {exc}"
+            return f"Failed to summarize: {exc}"
         
-        summary_text = getattr(summary_result, "text", "") or ""
+        # Agent returns prose directly
+        summary_text = summary_result.text
         if not summary_text:
-            logger.error("[SUMMARIZING] Summarizer produced no output")
+            logger.error("[SUMMARIZING] No output")
             return "Summarizer produced no output."
         
-        logger.info("[SUMMARIZING] Summary created successfully")
+        logger.info("[SUMMARIZING] Complete")
+        logger.info("")
         return summary_text

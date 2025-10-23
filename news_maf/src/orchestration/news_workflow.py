@@ -1,14 +1,10 @@
 """
-News Gathering Workflow - Microsoft Agent Framework
+News Gathering Workflow - 4 simple steps.
 
-This module implements a complete business process workflow for news gathering:
-1. Query Analysis (Router Agent)
-2. Parallel News Fetching (Category Agents - Concurrent Workflow)
-3. Data Consolidation (Deduplication)
-4. Executive Summary Generation (Summarizer Agent)
-
-The workflow treats agents as specialized components within a larger business process,
-demonstrating how workflows orchestrate multiple agents and operations.
+Step 1: Query Classification → Determine relevant news categories
+Step 2: News Gathering       → Fetch articles from multiple sources
+Step 3: Data Consolidation   → Remove duplicates
+Step 4: Summary Generation   → Create executive summary
 """
 import json
 import logging
@@ -18,8 +14,8 @@ from dataclasses import dataclass
 from agent_framework import ConcurrentBuilder
 from agent_framework.azure import AzureOpenAIChatClient
 
-from agents.router_agent import build_router_agent, route_categories
-from agents.category_agent import build_category_agent
+from agents.query_classifier_agent import build_query_classifier_agent, classify_query
+from agents.news_gatherer_agent import build_news_gatherer_agent
 from agents.summarizer_agent import build_summarizer_agent
 from utils.dedup import dedup_articles
 
@@ -28,57 +24,22 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class WorkflowContext:
-    """
-    Context object that flows through the workflow stages.
-    Represents the state and data at each step of the business process.
-    """
+    """Context data flowing through the 4 workflow steps."""
     user_query: str
     selected_categories: list[str] = None
     raw_articles: list[dict[str, Any]] = None
     unique_articles: list[dict[str, Any]] = None
     executive_summary: str = None
-    
-    
+
+
 class NewsGatheringWorkflow:
     """
-    A complete news gathering workflow that orchestrates multiple agents.
+    News gathering workflow with 4 clear steps.
     
-    This workflow demonstrates:
-    - Sequential stages with clear data flow
-    - Agents as components within business logic
-    - Concurrent execution where appropriate
-    - Human-readable workflow stages
-    - Context passing between stages
-    
-    Workflow Stages:
-    ┌─────────────────────────────────────────────────────────────┐
-    │ Stage 1: Query Analysis                                     │
-    │   Input: User's natural language query                      │
-    │   Component: Router Agent                                   │
-    │   Output: List of relevant categories                       │
-    └─────────────────────────────────────────────────────────────┘
-                              ↓
-    ┌─────────────────────────────────────────────────────────────┐
-    │ Stage 2: Parallel News Gathering (Concurrent Workflow)      │
-    │   Input: Categories                                         │
-    │   Components: Category Agents (Business, Tech, etc.)        │
-    │   Execution: Parallel via ConcurrentBuilder                 │
-    │   Output: Raw articles from all sources                     │
-    └─────────────────────────────────────────────────────────────┘
-                              ↓
-    ┌─────────────────────────────────────────────────────────────┐
-    │ Stage 3: Data Consolidation                                 │
-    │   Input: Raw articles                                       │
-    │   Operation: Deduplication logic                            │
-    │   Output: Unique articles                                   │
-    └─────────────────────────────────────────────────────────────┘
-                              ↓
-    ┌─────────────────────────────────────────────────────────────┐
-    │ Stage 4: Summary Generation                                 │
-    │   Input: Unique articles                                    │
-    │   Component: Summarizer Agent                               │
-    │   Output: Executive brief                                   │
-    └─────────────────────────────────────────────────────────────┘
+    Step 1: Query Classification → Determine relevant news categories
+    Step 2: News Gathering       → Fetch articles from multiple sources
+    Step 3: Data Consolidation   → Remove duplicates
+    Step 4: Summary Generation   → Create executive summary
     """
     
     def __init__(self, chat_client: AzureOpenAIChatClient):
@@ -88,299 +49,167 @@ class NewsGatheringWorkflow:
     
     async def execute(self, user_query: str) -> str:
         """
-        Execute the complete news gathering workflow.
-        
-        This is the main entry point that orchestrates all stages.
-        Each stage builds upon the previous one, demonstrating a
-        clear business process flow.
+        Execute the complete workflow: Classification → Gathering → Consolidation → Summary.
         
         Args:
-            user_query: Natural language query from user
+            user_query: User's news query
             
         Returns:
-            Formatted executive summary with metadata
+            Executive summary with metadata
         """
-        # Initialize workflow context
         context = WorkflowContext(user_query=user_query)
-        logger.info(f"[WORKFLOW] Starting news gathering workflow")
-        logger.info(f"[WORKFLOW] Query: {user_query}")
+        logger.info(f"[WORKFLOW] Starting workflow: {user_query}")
         
-        # Stage 1: Query Analysis
-        context = await self._stage1_analyze_query(context)
+        # STEP 1: Query Classification
+        context = await self._step_classify_query(context)
         if not context.selected_categories:
             return "Unable to determine relevant news categories."
         
-        # Stage 2: Parallel News Gathering
-        context = await self._stage2_gather_news(context)
+        # STEP 2: News Gathering
+        context = await self._step_gather_news(context)
         if not context.raw_articles:
             return "No news articles found."
         
-        # Stage 3: Data Consolidation
-        context = await self._stage3_consolidate_data(context)
+        # STEP 3: Data Consolidation
+        context = await self._step_consolidate_data(context)
         if not context.unique_articles:
             return "No unique articles after consolidation."
         
-        # Stage 4: Summary Generation
-        context = await self._stage4_generate_summary(context)
+        # STEP 4: Summary Generation
+        context = await self._step_generate_summary(context)
         
-        # Format final output
-        return self._format_workflow_output(context)
+        return self._format_output(context)
     
-    async def _stage1_analyze_query(self, context: WorkflowContext) -> WorkflowContext:
-        """
-        Stage 1: Query Analysis
-        
-        Uses router agent to analyze the user's query and determine
-        which news categories are relevant.
-        
-        Business Logic:
-        - Natural language understanding
-        - Category classification
-        - Multi-category support (1-3 categories)
-        
-        Agent: Router Agent
-        """
-        logger.info("[STAGE 1] Query Analysis - Starting")
-        logger.info("[STAGE 1] Calling Router Agent to analyze query...")
-        
-        router_agent = build_router_agent(self.chat_client)
-        categories = await route_categories(router_agent, context.user_query)
-        
+    async def _step_classify_query(self, context: WorkflowContext) -> WorkflowContext:
+        """STEP 1: Analyze query to determine relevant news categories."""
+        logger.info("[STEP 1] Classifying user query...")
+        classifier_agent = build_query_classifier_agent(self.chat_client)
+        categories = await classify_query(classifier_agent, context.user_query)
         context.selected_categories = categories
-        logger.info(f"[STAGE 1] Query Analysis - Complete")
-        logger.info(f"[STAGE 1] Selected categories: {categories}")
-        
+        logger.info(f"[STEP 1] Selected categories: {categories}")
+        logger.info("")
         return context
     
-    async def _stage2_gather_news(self, context: WorkflowContext) -> WorkflowContext:
-        """
-        Stage 2: Parallel News Gathering
+    async def _step_gather_news(self, context: WorkflowContext) -> WorkflowContext:
+        """STEP 2: Fetch news articles from selected categories (parallel if multiple)."""
+        logger.info(f"[STEP 2] Gathering news from {len(context.selected_categories)} categories...")
         
-        Fetches news articles from multiple categories concurrently.
-        Uses MAF ConcurrentBuilder workflow for parallel execution.
-        
-        Business Logic:
-        - Build specialized agents for each category
-        - Execute fetches in parallel for efficiency
-        - Handle single vs multi-category scenarios
-        
-        Components: Category Agents (one per category)
-        Workflow: ConcurrentBuilder for parallel execution
-        """
-        logger.info("[STAGE 2] News Gathering - Starting")
-        logger.info(f"[STAGE 2] Fetching from {len(context.selected_categories)} categories in parallel")
-        
-        # Build category-specific agents
-        category_agents = [
-            build_category_agent(self.chat_client, f"{cat}_agent", cat)
+        # Build one agent per category
+        agents = [
+            build_news_gatherer_agent(self.chat_client, f"{cat}_gatherer", cat)
             for cat in context.selected_categories
         ]
         
-        # Execute concurrent workflow or direct call based on count
-        if len(category_agents) >= 2:
-            # Use concurrent workflow for 2+ agents
-            raw_articles = await self._execute_concurrent_workflow(
-                category_agents, 
-                context.selected_categories
-            )
+        # Execute agents (parallel if 2+, serial if 1)
+        if len(agents) >= 2:
+            raw_articles = await self._execute_concurrent_agents(agents, context.selected_categories)
         else:
-            # Direct execution for single agent
-            raw_articles = await self._execute_single_agent(
-                category_agents[0],
-                context.selected_categories[0]
-            )
+            raw_articles = await self._execute_single_agent(agents[0], context.selected_categories[0])
         
         context.raw_articles = raw_articles
-        logger.info(f"[STAGE 2] News Gathering - Complete")
-        logger.info(f"[STAGE 2] Fetched {len(raw_articles)} articles")
-        
+        logger.info(f"[STEP 2] Gathered {len(raw_articles)} articles")
+        logger.info("")
         return context
     
-    async def _stage3_consolidate_data(self, context: WorkflowContext) -> WorkflowContext:
-        """
-        Stage 3: Data Consolidation
-        
-        Processes raw articles to remove duplicates and ensure data quality.
-        
-        Business Logic:
-        - Deduplication by URL
-        - Data validation
-        - Quality filtering
-        
-        Operation: Pure business logic (no AI agents)
-        """
-        logger.info("[STAGE 3] Data Consolidation - Starting")
-        logger.info(f"[STAGE 3] Processing {len(context.raw_articles)} raw articles")
-        
-        # Apply deduplication logic
+    async def _step_consolidate_data(self, context: WorkflowContext) -> WorkflowContext:
+        """STEP 3: Remove duplicate articles."""
+        logger.info(f"[STEP 3] Deduplicating {len(context.raw_articles)} articles...")
         unique_articles = dedup_articles(context.raw_articles)
-        
         context.unique_articles = unique_articles
-        logger.info(f"[STAGE 3] Data Consolidation - Complete")
-        logger.info(f"[STAGE 3] {len(unique_articles)} unique articles after deduplication")
-        
+        logger.info(f"[STEP 3] Consolidated to {len(unique_articles)} unique articles")
+        logger.info("")
         return context
     
-    async def _stage4_generate_summary(self, context: WorkflowContext) -> WorkflowContext:
-        """
-        Stage 4: Summary Generation
-        
-        Creates an executive summary from consolidated articles.
-        
-        Business Logic:
-        - Summarization of multiple articles
-        - Executive-level formatting
-        - Key insights extraction
-        
-        Agent: Summarizer Agent
-        """
-        logger.info("[STAGE 4] Summary Generation - Starting")
-        logger.info(f"[STAGE 4] Calling Summarizer Agent to create executive brief from {len(context.unique_articles)} articles...")
-        
+    async def _step_generate_summary(self, context: WorkflowContext) -> WorkflowContext:
+        """STEP 4: Create executive summary."""
+        logger.info(f"[STEP 4] Generating summary from {len(context.unique_articles)} articles...")
         summarizer_agent = build_summarizer_agent(self.chat_client)
-        articles_json = json.dumps(context.unique_articles)
         
         try:
-            summary_result = await summarizer_agent.run(articles_json)
-            context.executive_summary = summary_result.text or "No summary generated."
-            logger.info("[STAGE 4] Summary Generation - Complete")
+            result = await summarizer_agent.run(json.dumps(context.unique_articles))
+            # Agent returns prose directly - no parsing needed
+            context.executive_summary = result.text or "No summary generated."
+            logger.info("[STEP 4] Summary complete")
+            logger.info("")
         except Exception as e:
-            logger.error(f"[STAGE 4] Summary Generation - Failed: {e}")
-            context.executive_summary = f"Failed to generate summary: {e}"
+            logger.error(f"[STEP 4] Summary failed: {e}")
+            context.executive_summary = f"Summary generation failed: {e}"
         
         return context
     
-    async def _execute_concurrent_workflow(
+    async def _execute_concurrent_agents(
         self, 
-        category_agents: list[Any],
+        agents: list[Any],
         categories: list[str]
     ) -> list[dict[str, Any]]:
-        """
-        Execute a concurrent workflow using MAF ConcurrentBuilder.
-        
-        This demonstrates the workflow pattern where multiple agents
-        run in parallel (superstep 1) and results are aggregated (superstep 2).
-        """
-        logger.info("[CONCURRENT] Building MAF concurrent workflow")
-        
-        # Create aggregator function for workflow
+        """Execute agents concurrently using ConcurrentBuilder."""
         all_articles = []
         
         async def aggregate_agent_results(results):
-            """Aggregator function called by workflow after parallel execution."""
-            logger.info(f"[CONCURRENT] Aggregating results from {len(results)} agents")
-            
+            """Aggregate results from parallel agents."""
+            logger.info(f"[CONCURRENT] Aggregating {len(results)} agent responses...")
             for result in results:
-                # Extract category from executor ID
                 executor_id = getattr(result, "executor_id", "") or ""
-                category = executor_id.removesuffix("_agent") if executor_id else "unknown"
+                category = executor_id.removesuffix("_gatherer") if executor_id else "unknown"
                 
-                # Extract and parse response
-                response_text = self._extract_agent_response(result.agent_run_response)
+                # Agent returns tool result directly
+                response_text = result.agent_run_response.text
                 if response_text:
-                    articles = self._parse_json_response(response_text, category)
-                    all_articles.extend(articles)
-            
+                    try:
+                        articles = json.loads(response_text.strip())
+                        if isinstance(articles, list):
+                            for article in articles:
+                                if isinstance(article, dict):
+                                    article.setdefault("category", category)
+                                    all_articles.append(article)
+                    except json.JSONDecodeError as e:
+                        logger.warning(f"[{category}] JSON parse failed: {e}")
             return all_articles
         
-        # Build and execute workflow
         workflow = (
             ConcurrentBuilder()
-            .participants(category_agents)
+            .participants(agents)
             .with_aggregator(aggregate_agent_results)
             .build()
         )
         
-        logger.info(f"[CONCURRENT] Executing workflow to fetch news from {len(category_agents)} category agents in parallel...")
-        fetch_instruction = "Fetch the latest top headlines for your category."
-        run_result = await workflow.run(fetch_instruction)
-        
-        logger.info("[CONCURRENT] Workflow execution complete")
+        await workflow.run("Gather the latest top headlines for your category.")
         return all_articles
     
     async def _execute_single_agent(self, agent: Any, category: str) -> list[dict[str, Any]]:
-        """Execute a single agent directly (fallback for 1 category)."""
-        logger.info(f"[DIRECT] Executing single agent for category: {category}")
-        logger.info(f"[DIRECT] Calling {category} Category Agent to fetch top headlines...")
+        """Execute single agent directly."""
+        result = await agent.run("Gather the latest top headlines for your category.")
         
-        fetch_instruction = "Fetch the latest top headlines for your category."
-        agent_result = await agent.run(fetch_instruction)
-        
-        response_text = self._extract_agent_response(agent_result)
+        # Agent returns tool result directly
+        response_text = result.text
         if not response_text:
-            logger.warning(f"[DIRECT] Empty response from {category} agent")
+            logger.warning(f"[{category}] Empty response")
             return []
-        
-        articles = self._parse_json_response(response_text, category)
-        logger.info(f"[DIRECT] Fetched {len(articles)} articles from {category}")
-        return articles
-    
-    def _extract_agent_response(self, agent_response) -> str | None:
-        """Extract text content from agent response."""
-        # Try messages first
-        messages = list(getattr(agent_response, "messages", []) or [])
-        if messages:
-            for message in reversed(messages):
-                text = getattr(message, "text", None)
-                if text:
-                    return text
-        
-        # Fallback to direct text
-        return getattr(agent_response, "text", None)
-    
-    def _parse_json_response(self, response_text: str, category: str) -> list[dict[str, Any]]:
-        """Parse JSON response from agent, handling markdown code fences."""
-        # Strip markdown code fences
-        response_text = response_text.strip()
-        if response_text.startswith("```"):
-            lines = response_text.split("\n")
-            if lines[-1].strip() == "```":
-                lines = lines[1:-1]
-            else:
-                lines = lines[1:]
-            response_text = "\n".join(lines).strip()
-            logger.debug(f"[{category.upper()}] Stripped markdown code fences")
         
         try:
-            payload = json.loads(response_text)
+            articles = json.loads(response_text.strip())
+            if not isinstance(articles, list):
+                return []
+            
+            # Add category metadata
+            for article in articles:
+                if isinstance(article, dict):
+                    article.setdefault("category", category)
+            
+            return articles
         except json.JSONDecodeError as e:
-            logger.error(f"[{category.upper()}] JSON parse error: {e}")
-            logger.error(f"[{category.upper()}] Response preview: {response_text[:200]}")
+            logger.warning(f"[{category}] JSON parse failed: {e}")
             return []
-        
-        # Validate response structure
-        if isinstance(payload, dict) and payload.get("error"):
-            logger.error(f"[{category.upper()}] Error in response: {payload['error']}")
-            return []
-        
-        if not isinstance(payload, list):
-            logger.warning(f"[{category.upper()}] Expected list, got {type(payload).__name__}")
-            return []
-        
-        # Add category metadata
-        articles = []
-        for article in payload:
-            if isinstance(article, dict):
-                article.setdefault("category", category)
-                articles.append(article)
-        
-        logger.info(f"[{category.upper()}] Parsed {len(articles)} articles")
-        return articles
     
-    def _format_workflow_output(self, context: WorkflowContext) -> str:
-        """Format the final workflow output with metadata."""
-        # Build metadata header
+    def _format_output(self, context: WorkflowContext) -> str:
+        """Format final output with metadata."""
         if len(context.selected_categories) == 1:
-            header = f"**Category analyzed:** {context.selected_categories[0]}"
+            header = f"**Category:** {context.selected_categories[0]}"
         else:
-            header = f"**Categories analyzed (in parallel):** {', '.join(context.selected_categories)}"
+            header = f"**Categories (parallel):** {', '.join(context.selected_categories)}"
         
-        # Add workflow statistics
         stats = (
-            f"\n*Workflow Statistics: "
-            f"{len(context.raw_articles)} articles fetched, "
-            f"{len(context.unique_articles)} unique articles, "
-            f"{len(context.selected_categories)} categories*\n"
+            f"\n*Statistics: {len(context.raw_articles)} articles gathered, "
+            f"{len(context.unique_articles)} unique, {len(context.selected_categories)} categories*\n"
         )
-        
         return f"{header}{stats}\n{context.executive_summary}"
