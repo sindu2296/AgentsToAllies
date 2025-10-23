@@ -14,14 +14,8 @@ INSTRUCTIONS = """You are a query classifier. Analyze the user query and determi
 
 Available categories: technology, sports, business, science, health, entertainment, general
 
-Rules:
-1. Select 1-3 most relevant categories
-2. If no clear match, return ["general"]
-3. Output ONLY a valid JSON array of category strings
-4. NO markdown code blocks, NO explanations, NO extra text
-5. Example output: ["technology", "business"]
-
-Output format: ["category1", "category2"]"""
+Select 1-3 most relevant categories. If no clear match, use "general".
+Just list the category names, separated by commas or spaces."""
 
 
 def build_query_classifier_agent(chat_client: AzureOpenAIChatClient) -> ChatAgent:
@@ -46,35 +40,23 @@ async def classify_query(classifier: ChatAgent, query: str) -> List[str]:
     """
     try:
         result = await classifier.run(query)
-        
-        # Get response text
         response_text = result.text
+        
         if not response_text:
             logger.warning("[CLASSIFIER] Empty response, using general")
             return ["general"]
         
-        # Clean and parse
-        response_text = response_text.strip()
+        # Extract category names from response (handles "technology, business" or "technology business")
+        response_text = response_text.lower().strip()
         
-        # Remove markdown fences if present
-        if response_text.startswith("```"):
-            lines = response_text.split("\n")
-            if lines[-1].strip() == "```":
-                response_text = "\n".join(lines[1:-1]).strip()
-            else:
-                response_text = "\n".join(lines[1:]).strip()
+        # Find all valid categories mentioned in the response
+        found_categories = []
+        for category in CATEGORIES:
+            if category in response_text:
+                found_categories.append(category)
         
-        # Parse JSON
-        import json
-        categories = json.loads(response_text)
-        
-        if not isinstance(categories, list):
-            logger.warning("[CLASSIFIER] Not a list, using general")
-            return ["general"]
-        
-        # Filter to valid categories
-        valid = [c.lower() for c in categories if isinstance(c, str) and c.lower() in CATEGORIES]
-        return valid if valid else ["general"]
+        # Return found categories or default to general
+        return found_categories if found_categories else ["general"]
         
     except Exception as e:
         logger.error(f"[CLASSIFIER] Error: {e}, using general")
