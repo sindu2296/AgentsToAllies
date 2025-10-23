@@ -80,13 +80,13 @@ pip install -r requirements.txt
 4. Select branch: `main`
 5. Click **Create codespace**
 
-### 2. Wait for Environment Setup
+### 2. Wait for Automatic Environment Setup
 The Codespace will automatically:
 - ✅ Pull the repository code
 - ✅ Install Python 3.13.9
+- ✅ Install all dependencies from `requirements.txt`
 - ✅ Install all required VS Code extensions
-- ✅ Configure port forwarding for applications
-- ✅ Set up the development environment
+- ✅ Configure port forwarding for applications (e.g., Streamlit on port 8501)
 
 **This takes 2-5 minutes on first creation.**
 
@@ -97,12 +97,7 @@ pwd
 # Should show: /workspaces/AgentsToAllies
 ```
 
-**Note:** No virtual environment needed! The Codespace container provides complete isolation.
-
-### 4. Install dependencies
-```bash
-pip install -r requirements.txt
-```
+**Note:** No virtual environment or manual dependency installation needed! The Codespace container provides complete isolation, and all dependencies are automatically installed via the DevContainer configuration.
 
 </details>
 
