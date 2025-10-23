@@ -124,7 +124,7 @@ SERPAPI_API_KEY="<your_serp_api>"
 
 #### 2. Get API Keys
 
-**Azure OpenAI credentials **: 
+**Azure OpenAI credentials**: 
 Refer to [AZURE_AIFOUNDRY_SETUP.md](./AZURE_AIFOUNDRY_SETUP.md) for step-by-step instructions on how to set up Azure AI Foundry and get your API key and endpoint values.
 
 **SERPAPI_API_KEY:**  
