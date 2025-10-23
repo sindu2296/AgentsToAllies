@@ -6,50 +6,136 @@ From Agents to Allies: Empowering Technologists with Multi-Agent AI Workflows
 ### Abstract: 
 This session is built for technologists who want to understand how multi-agent systems work, build them from the ground up, and be part of the rapidly growing ecosystem shaping their future. Instead of abstract concepts, we'll explore this shift through real-time demos and an honest, practical look at the tools and frameworks available today.
 
-## Setup
+## 🚀 Setup
 
-1. Install/Use an IDE of your choice. We are using Visual Studio Code.
-   Some of the IDE Installers: 
-   Visual Studio Code: https://code.visualstudio.com/download
+Choose your development environment:
 
-2. Download and Install Python 3.13.9 from: https://www.python.org/downloads/
+<details>
+<summary><b>💻 Option 1: Local Machine Setup</b> (Windows/Mac/Linux)</summary>
 
-3. Create and activate a Python virtual environment:
-   Powershell command to Create:
-   ```
-   python -m venv env 
-   ```
-   Powershell command to activate
-   ```
-   .\env\Scripts\activate  # Windows
-   source env/bin/activate # Unix/MacOS
-   ```
+### 1. Install/Use an IDE of your choice
+We are using Visual Studio Code.
+- Visual Studio Code: https://code.visualstudio.com/download
 
-4. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+### 2. Clone the Repository
+```bash
+git clone https://github.com/sindu2296/AgentsToAllies.git
+cd AgentsToAllies
+```
 
-5. Create .env file at the root folder and add this 
-    ```
-    AZURE_OPENAI_API_KEY= "<your_api_key>"
-    AZURE_OPENAI_ENDPOINT="<your_endpoint>"
-    MODEL_NAME="<your_model_name>"
-    AI_FOUNDRY_AZURE_OPENAI_API_KEY="<your_api_key>"
-    NEWSAPI_API_KEY="<news_api_key>"
-    AZURE_OPENAI_CHAT_DEPLOYMENT_NAME="<your_model_name>"
-    AZURE_AI_PROJECT_ENDPOINT="<your_endpoint>"
-    AZURE_AI_MODEL_DEPLOYMENT_NAME="<your_model_name>"
-    SERPAPI_API_KEY="<your_serp_api>"
-    ```
-   
-6. **For Azure OpenAI credentials:** Refer to [AZURE_AIFOUNDRY_SETUP.md](./AZURE_AIFOUNDRY_SETUP.md) for step-by-step instructions on how to set up Azure AI Foundry and get your API key and endpoint values.
+### 3. Download and Install Python 3.13.9
+Download from: https://www.python.org/downloads/
 
-7. Get SERPAPI_API_KEY by signing up to https://serpapi.com/. Register with the email and phone-number to recieve a unique api key.
-   Update the SERPAPI_API_KEY in the .env file with key obtained
+Verify installation:
+```bash
+python --version
+# Should output: Python 3.13.9
+```
 
-8. Get the NEWSAPI_API_KEY from https://newsapi.org/. Register with email and password to get the API key.
-   Update the NEWSAPI_API_KEY in the .env file with key obtained
+### 4. Create and activate a Python virtual environment
+
+**Windows (PowerShell):**
+```powershell
+# Create virtual environment
+python -m venv env
+
+# Activate virtual environment
+.\env\Scripts\Activate.ps1
+
+# If you get execution policy error, run:
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+**Unix/MacOS:**
+```bash
+# Create virtual environment
+python -m venv env
+
+# Activate virtual environment
+source env/bin/activate
+```
+
+### 5. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+</details>
+
+<details>
+<summary><b>☁️ Option 2: GitHub Codespaces Setup</b> (Cloud-based)</summary>
+
+### 1. Create a Codespace
+
+**Option A: From GitHub Repository**
+1. Navigate to [https://github.com/sindu2296/AgentsToAllies](https://github.com/sindu2296/AgentsToAllies)
+2. Click the **Code** button (green button)
+3. Select the **Codespaces** tab
+4. Click **Create codespace on main**
+
+**Option B: From GitHub Codespaces Dashboard**
+1. Go to [https://github.com/codespaces](https://github.com/codespaces)
+2. Click **New codespace**
+3. Select repository: `sindu2296/AgentsToAllies`
+4. Select branch: `main`
+5. Click **Create codespace**
+
+### 2. Wait for Automatic Environment Setup
+The Codespace will automatically:
+- ✅ Pull the repository code
+- ✅ Install Python 3.13.9
+- ✅ Install all dependencies from `requirements.txt`
+- ✅ Install all required VS Code extensions
+- ✅ Configure port forwarding for applications (e.g., Streamlit on port 8501)
+
+**This takes 2-5 minutes on first creation.**
+
+### 3. Verify Setup
+Once the Codespace loads, verify you're in the correct location:
+```bash
+pwd
+# Should show: /workspaces/AgentsToAllies
+```
+
+**Note:** No virtual environment or manual dependency installation needed! The Codespace container provides complete isolation, and all dependencies are automatically installed via the DevContainer configuration.
+
+</details>
+
+---
+
+### Common Setup Steps (Required for Both Options)
+
+Once you've completed either Option 1 or Option 2 above, follow these steps:
+
+#### 1. Create .env file at the root folder
+Create a `.env` file in the root directory with the following content:
+
+```env
+AZURE_OPENAI_API_KEY= "<your_api_key>"
+AZURE_OPENAI_ENDPOINT="<your_endpoint>"
+MODEL_NAME="<your_model_name>"
+AI_FOUNDRY_AZURE_OPENAI_API_KEY="<your_api_key>"
+NEWSAPI_API_KEY="<news_api_key>"
+AZURE_OPENAI_CHAT_DEPLOYMENT_NAME="<your_model_name>"
+AZURE_AI_PROJECT_ENDPOINT="<your_endpoint>"
+AZURE_AI_MODEL_DEPLOYMENT_NAME="<your_model_name>"
+SERPAPI_API_KEY="<your_serp_api>"
+```
+
+#### 2. Get API Keys
+
+**Azure OpenAI credentials **: 
+Refer to [AZURE_AIFOUNDRY_SETUP.md](./AZURE_AIFOUNDRY_SETUP.md) for step-by-step instructions on how to set up Azure AI Foundry and get your API key and endpoint values.
+
+**SERPAPI_API_KEY:**  
+Sign up at https://serpapi.com/. Register with email and phone number to receive a unique API key.
+Update the SERPAPI_API_KEY in the .env file with the key obtained.
+
+**NEWSAPI_API_KEY:**  
+Get from https://newsapi.org/. Register with email and password to get the API key.
+Update the NEWSAPI_API_KEY in the .env file with the key obtained.
+
+---
 
 ## Sample Projects
 
