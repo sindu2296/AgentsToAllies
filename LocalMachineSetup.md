@@ -1,4 +1,4 @@
-# AgentsToAllies
+# AgentsToAllies - Local Machine Setup
 
 ### Topic: 6044:
 From Agents to Allies: Empowering Technologists with Multi-Agent AI Workflows
@@ -6,14 +6,72 @@ From Agents to Allies: Empowering Technologists with Multi-Agent AI Workflows
 ### Abstract: 
 This session is built for technologists who want to understand how multi-agent systems work, build them from the ground up, and be part of the rapidly growing ecosystem shaping their future. Instead of abstract concepts, we'll explore this shift through real-time demos and an honest, practical look at the tools and frameworks available today.
 
-## 🚀 Quick Start
+## Setup
 
-Choose your development environment and follow the complete setup guide:
+### 1. Install/Use an IDE of your choice
+We are using Visual Studio Code.
+Some of the IDE Installers: 
+- Visual Studio Code: https://code.visualstudio.com/download
 
-- **💻 [Local Machine Setup](./LocalMachineSetup.md)** - Set up on your Windows/Mac/Linux machine with Python virtual environment
-- **☁️ [GitHub Codespaces Setup](./CodespacesSetup.md)** - Get started instantly in the cloud with pre-configured DevContainer
+### 2. Clone the Repository
+```powershell
+git clone https://github.com/sindu2296/AgentsToAllies.git
+cd AgentsToAllies
+```
 
-Both guides include complete step-by-step instructions for installation, configuration, and running all sample projects.
+### 3. Download and Install Python 3.13.9
+Download from: https://www.python.org/downloads/
+
+Verify installation:
+```powershell
+python --version
+# Should output: Python 3.13.9
+```
+
+### 4. Create and activate a Python virtual environment
+Powershell command to Create:
+```powershell
+python -m venv env 
+```
+Powershell command to activate:
+```powershell
+.\env\Scripts\Activate.ps1  # Windows
+source env/bin/activate      # Unix/MacOS
+```
+
+If you get execution policy error on Windows, run:
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+### 5. Install dependencies
+```powershell
+pip install -r requirements.txt
+```
+
+### 6. Create .env file at the root folder and add this 
+```
+AZURE_OPENAI_API_KEY= "<your_api_key>"
+AZURE_OPENAI_ENDPOINT="<your_endpoint>"
+MODEL_NAME="<your_model_name>"
+AI_FOUNDRY_AZURE_OPENAI_API_KEY="<your_api_key>"
+NEWSAPI_API_KEY="<news_api_key>"
+AZURE_OPENAI_CHAT_DEPLOYMENT_NAME="<your_model_name>"
+AZURE_AI_PROJECT_ENDPOINT="<your_endpoint>"
+AZURE_AI_MODEL_DEPLOYMENT_NAME="<your_model_name>"
+SERPAPI_API_KEY="<your_serp_api>"
+```
+
+### 7. **📋 For Azure OpenAI credentials:** 
+Refer to [AZURE_AIFOUNDRY_SETUP.md](./AZURE_AIFOUNDRY_SETUP.md) for step-by-step instructions on how to set up Azure AI Foundry and get your API key and endpoint values.
+
+### 8. Get SERPAPI_API_KEY
+Sign up to https://serpapi.com/. Register with the email and phone-number to receive a unique api key.
+Update the SERPAPI_API_KEY in the .env file with key obtained
+
+### 9. Get the NEWSAPI_API_KEY
+Get from https://newsapi.org/. Register with email and password to get the API key.
+Update the NEWSAPI_API_KEY in the .env file with key obtained
 
 ## Sample Projects
 
@@ -40,7 +98,7 @@ Located in the `news` and `news_maf` folders, these samples show **two different
 - Concurrent: Parallel processing with `ConcurrentBuilder`
 - Uses: `ChatAgent`, function tools, simpler setup
 - Run with:
-  ```
+  ```powershell
   cd news_maf
   streamlit run app.py
   ```
@@ -60,7 +118,7 @@ Located in the `job_recommendation` and `job_recommendation_maf` folders, these 
 - Sequential: Multiple agents working one after another (extract, recommend, summarize)
 - Uses: `ChatAgent`, SerpAPI integration
 - Run with:
-  ```
+  ```powershell
   cd job_recommendation_maf
   streamlit run app.py
   ```
