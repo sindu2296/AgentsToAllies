@@ -9,7 +9,9 @@ def build_summarizer_agent(chat_client: AzureOpenAIChatClient) -> ChatAgent:
     """Create summarizer agent."""
     instructions = (
         "Create 5-bullet executive summary from articles. "
-        "Include inline citations [Source](url). Professional tone."
+        "Include inline citations [Source](url). "
+        "Use plain text - avoid ** for bold, avoid $ symbols (write 'USD' or 'dollars' instead). "
+        "Professional tone."
     )
     
     return ChatAgent(
