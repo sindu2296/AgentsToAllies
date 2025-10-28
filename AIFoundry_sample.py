@@ -9,7 +9,7 @@ endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
 model_name = os.getenv("MODEL_NAME")
 deployment = model_name
 
-subscription_key = os.getenv("AI_FOUNDRY_AZURE_OPENAI_API_KEY")
+subscription_key = os.getenv("AZURE_OPENAI_API_KEY")
 api_version = "2024-12-01-preview"
 
 client = AzureOpenAI(

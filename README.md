@@ -114,10 +114,8 @@ Create a `.env` file in the root directory with the following content:
 AZURE_OPENAI_API_KEY= "<your_api_key>"
 AZURE_OPENAI_ENDPOINT="<your_endpoint>"
 MODEL_NAME="<your_model_name>"
-AI_FOUNDRY_AZURE_OPENAI_API_KEY="<your_api_key>"
 NEWSAPI_API_KEY="<news_api_key>"
 AZURE_OPENAI_CHAT_DEPLOYMENT_NAME="<your_model_name>"
-AZURE_AI_PROJECT_ENDPOINT="<your_endpoint>"
 AZURE_AI_MODEL_DEPLOYMENT_NAME="<your_model_name>"
 SERPAPI_API_KEY="<your_serp_api>"
 ```

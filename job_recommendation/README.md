@@ -28,7 +28,7 @@ This project demonstrates how to build a modular job recommendation system using
    ```
    AZURE_OPENAI_ENDPOINT=your_azure_endpoint
    MODEL_NAME=your_model_name
-   AI_FOUNDRY_AZURE_OPENAI_API_KEY=your_api_key
+   AZURE_OPENAI_API_KEY=your_api_key
    SERPAPI_API_KEY=your_serpapi_key
    ```
 
