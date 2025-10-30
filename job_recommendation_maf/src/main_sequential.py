@@ -6,7 +6,7 @@ Flow: Extract jobs → Recommend top matches → Summarize results
 """
 import asyncio
 from config import build_chat_client
-from orchestration.sequential_orchestrator import run_sequential_job_workflow
+from orchestration.sequential_orchestrator import run_job_recommendation_AI_workflow
 
 async def main():
     """
@@ -28,7 +28,7 @@ async def main():
         print(f"USER PROFILE: {user_profile}")
         print("="*80)
         
-        result = await run_sequential_job_workflow(chat_client, user_profile)
+        result = await run_job_recommendation_AI_workflow(chat_client, user_profile)
         
         print(result)
         print("\n" + "="*80 + "\n")
