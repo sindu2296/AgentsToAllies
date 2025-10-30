@@ -113,6 +113,7 @@ def _format_staged_results(all_messages, user_profile):
 def _log_detailed_stages(job_extraction, job_analysis, job_summary, user_profile):
     """Log detailed workflow stages for display in workflow logs section."""
     
+    logger.info("=" * 80)
     # Stage 1: Job Extractor Agent
     if job_extraction:
         logger.info("[STAGE 1] Job Extraction - Starting")
@@ -138,6 +139,7 @@ def _log_detailed_stages(job_extraction, job_analysis, job_summary, user_profile
         
         logger.info("[STAGE 1] Job Extraction - Complete")
     
+    logger.info("=" * 80)
     # Stage 2: Job Recommendation Agent
     if job_analysis:
         logger.info("[STAGE 2] Job Analysis - Starting")
@@ -146,6 +148,7 @@ def _log_detailed_stages(job_extraction, job_analysis, job_summary, user_profile
         logger.info("[RECOMMENDER] Jobs analyzed and ranked by relevance")
         logger.info("[STAGE 2] Job Analysis - Complete")
     
+    logger.info("=" * 80)
     # Stage 3: Job Summary Agent
     if job_summary:
         logger.info("[STAGE 3] Summary Generation - Starting")
@@ -153,3 +156,4 @@ def _log_detailed_stages(job_extraction, job_analysis, job_summary, user_profile
         logger.info("[SUMMARIZER] AI-powered personalized job recommendations generated")
         logger.info("[SUMMARIZER] Top job recommendations finalized")
         logger.info("[STAGE 3] Summary Generation - Complete")
+    logger.info("=" * 80)

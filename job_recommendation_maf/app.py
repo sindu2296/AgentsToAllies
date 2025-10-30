@@ -107,7 +107,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Title and description
-st.title("💼 Multi-AI Agent Job Recommendation Workflow")
+st.title("💼 Job Recommendation AI Workflow")
 st.markdown("""
     **Welcome!** Enter your professional profile and watch as multiple AI agents 
     collaborate to find and recommend the best job opportunities for you. 
@@ -136,16 +136,13 @@ with st.sidebar:
         2. **Job Recommendation Agent** - AI analysis with GPT-4o
         3. **Job Summary Agent** - Creates final personalized job recommendations
         
-        ### Input Example:
-        "Software engineer with Python Experience"
     """)
 
 # Main input area
 st.markdown("### 👤 Your Professional Profile")
 user_profile = st.text_area(
     "Describe your role, skills, and experience",
-    value="Software Engineer with Python Experience",
-    placeholder="e.g., 'Software engineer with 5+ years of Python and AWS cloud experience'",
+    placeholder="e.g., 'Software Engineer with Python Experience'",
     height=100,
     label_visibility="collapsed"
 )
