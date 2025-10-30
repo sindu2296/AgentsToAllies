@@ -14,7 +14,7 @@ from agents.job_summary_agent import build_job_summary_agent
 logger = logging.getLogger(__name__)
 
 
-async def run_sequential_job_workflow(chat_client: AzureOpenAIChatClient, user_profile: str) -> str:
+async def run_job_recommendation_AI_workflow(chat_client: AzureOpenAIChatClient, user_profile: str) -> str:
     """
     Run the sequential job recommendation workflow.
     

@@ -10,7 +10,7 @@ import contextlib
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from config import build_chat_client
-from orchestration.sequential_orchestrator import run_sequential_job_workflow
+from orchestration.sequential_orchestrator import run_job_recommendation_AI_workflow
 
 # Keep clean logs - structured workflow logging is handled in the orchestrator
 
@@ -215,8 +215,8 @@ if run_button and user_profile:
             sys.stdout = st.session_state.print_capture
             
             try:
-                # Execute workflow using sequential orchestrator
-                result = asyncio.run(run_sequential_job_workflow(chat_client, user_profile))
+                # Execute workflow using AI workflow orchestrator
+                result = asyncio.run(run_job_recommendation_AI_workflow(chat_client, user_profile))
             finally:
                 sys.stdout = original_stdout
             
