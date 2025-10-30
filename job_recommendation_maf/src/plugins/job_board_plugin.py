@@ -4,11 +4,14 @@ Provides a function tool for fetching jobs from SerpAPI (Google Jobs).
 """
 import os
 import json
+import logging
 import requests
 from typing import List, Dict, Any
 from dotenv import load_dotenv
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 def search_jobs(user_profile: str, limit: int = 5) -> str:
     """
@@ -25,7 +28,7 @@ def search_jobs(user_profile: str, limit: int = 5) -> str:
     if not api_key:
         return json.dumps({"error": "SERPAPI_API_KEY not set"})
     
-    print(f"[PLUGIN] Searching jobs for: {user_profile}")
+    logger.info(f"[PLUGIN] Searching jobs for: {user_profile}")
     
     url = "https://serpapi.com/search.json"
     params = {
@@ -57,7 +60,7 @@ def search_jobs(user_profile: str, limit: int = 5) -> str:
                 "description": desc,
             })
         
-        print(f"[PLUGIN] Found {len(jobs_out)} jobs")
+        logger.info(f"[PLUGIN] Found {len(jobs_out)} jobs")
         return json.dumps(jobs_out)
         
     except requests.RequestException as e:
