@@ -111,7 +111,7 @@ st.title("💼 Multi-AI Agent Job Recommendation Workflow")
 st.markdown("""
     **Welcome!** Enter your professional profile and watch as multiple AI agents 
     collaborate to find and recommend the best job opportunities for you. 
-    The workflow runs through sequential stages for thorough job analysis.
+    The workflow runs through 3 sequential stages for thorough job analysis.
 """)
 
 # Initialize log capture in session state
@@ -134,17 +134,17 @@ with st.sidebar:
         ### AI Workflow Stages:
         1. **Job Extractor Agent** - Uses SERP API to find relevant jobs
         2. **Job Recommendation Agent** - AI analysis with GPT-4o
-        3. **Job Summary Agent** - Creates summary with GPT-4o
-        4. **Top 5 Recommended Jobs** - Final curated job list
+        3. **Job Summary Agent** - Creates final personalized job recommendations
         
         ### Input Example:
-        "Software engineer with Python and Azure cloud experience"
+        "Software engineer with Python Experience"
     """)
 
 # Main input area
 st.markdown("### 👤 Your Professional Profile")
 user_profile = st.text_area(
     "Describe your role, skills, and experience",
+    value="Software Engineer with Python Experience",
     placeholder="e.g., 'Software engineer with 5+ years of Python and AWS cloud experience'",
     height=100,
     label_visibility="collapsed"
@@ -167,7 +167,6 @@ if run_button and user_profile:
         "stage1": st.container(),
         "stage2": st.container(), 
         "stage3": st.container(),
-        "stage4": st.container(),
         "logs": st.container(),
         "results": st.container()
     }
@@ -198,15 +197,7 @@ if run_button and user_profile:
                 with st.spinner("Stage 3: Job Summary Agent..."):
                     st.markdown(
                         '<div class="workflow-stage"><div class="stage-title">Stage 3: Job Summary Agent</div>'
-                        '<div class="stage-content">📝 GPT-4o creating personalized job summary...</div></div>',
-                        unsafe_allow_html=True
-                    )
-            
-            with stage_containers["stage4"]:
-                with st.spinner("Stage 4: Top 5 Recommended Jobs..."):
-                    st.markdown(
-                        '<div class="workflow-stage"><div class="stage-title">Stage 4: Top 5 Recommended Jobs</div>'
-                        '<div class="stage-content">⭐ Finalizing curated list of best job matches...</div></div>',
+                        '<div class="stage-content">📝 GPT-4o creating final personalized job recommendations...</div></div>',
                         unsafe_allow_html=True
                     )
             
