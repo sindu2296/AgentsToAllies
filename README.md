@@ -186,3 +186,58 @@ Located in the `job_recommendation` and `job_recommendation_maf` folders, these 
 Agents use SerpAPI to fetch jobs, recommend relevant ones, and summarize results.
 
 Please refer to README file in the respective folders for more details.
+
+---
+
+## 🧹 Post-Workshop Cleanup
+
+After completing the workshop, it's important to clean up your resources to avoid unnecessary costs and maintain security. Follow these steps:
+
+### 1. 🗂️ Codespace Cleanup (if using GitHub Codespaces)
+
+**Stop your Codespace:**
+1. Go to [https://github.com/codespaces](https://github.com/codespaces)
+2. Find your `AgentsToAllies` codespace
+3. Click the **⋯** (three dots) menu
+4. Select **Stop codespace**
+
+**Delete your Codespace (optional):**
+1. Go to [https://github.com/codespaces](https://github.com/codespaces)
+2. Find your `AgentsToAllies` codespace
+3. Click the **⋯** (three dots) menu
+4. Select **Delete**
+5. Confirm deletion
+
+> **Why delete?** While stopped Codespaces don't consume compute hours, deleting frees up your Codespace storage quota and keeps your dashboard clean. You can always recreate it later if needed.
+
+### 2. 🔑 API Key Security
+
+**Remove or Rotate API Keys:**
+
+**For SERPAPI:**
+1. Go to [https://serpapi.com/manage-api-key](https://serpapi.com/manage-api-key)
+2. Either delete the API key or generate a new one
+
+**For NewsAPI:**
+1. Go to [https://newsapi.org/account](https://newsapi.org/account)
+2. Either delete the API key or generate a new one
+
+**For Azure OpenAI:**
+1. Go to [Azure Portal](https://portal.azure.com)
+2. Navigate to your Azure AI Foundry resource
+3. Go to **Keys and Endpoint** section
+4. Click **Regenerate** for both Key 1 and Key 2
+
+### 3. 📊 Check Usage & Billing
+
+**Azure:**
+1. Visit [Azure Cost Management](https://portal.azure.com/#view/Microsoft_Azure_CostManagement/Menu/~/Overview)
+2. Review your spending for AI services
+
+**SERPAPI:**
+1. Check your usage at [https://serpapi.com/dashboard](https://serpapi.com/dashboard)
+
+**NewsAPI:**
+1. Review usage at [https://newsapi.org/account](https://newsapi.org/account)
+
+> **💡 Tip:** Set up billing alerts in Azure to avoid unexpected charges in future projects!
