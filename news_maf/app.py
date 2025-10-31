@@ -48,7 +48,7 @@ class PrintCapture:
         self.logs = []
 
 st.set_page_config(
-    page_title="Multi-AI News Workflow",
+    page_title="News Extraction AI Workflow",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -77,11 +77,18 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Title and description
-st.title("📰 Multi-AI Agent News Workflow")
+st.title("📰 News Extraction AI Workflow")
 st.markdown("""
-    **Welcome!** Enter any query and watch as multiple AI agents collaborate to gather, 
-    analyze, and summarize news across different categories. The workflow runs in parallel 
-    stages for maximum efficiency.
+    **Welcome!** This workflow helps you discover and summarize **news by category** 
+    (e.g., technology, health, business). 
+    
+    ⚠️ **Note:** This is designed for category-based queries, not specific news items. 
+    For example:
+    - ✅ "What's new in technology and health?"
+    - ✅ "Give me top headlines in entertainment and sports"
+    - ❌ "What did Trump say about X?" (too specific)
+    
+    Multiple AI agents work in parallel to gather, deduplicate, and summarize articles efficiently.
 """)
 
 # Initialize log capture in session state
@@ -101,11 +108,15 @@ if "log_capture" not in st.session_state:
 with st.sidebar:
     st.header("ℹ️ Workflow Information")
     st.markdown("""
-        ### Workflow Stages:
-        1. **Query Analysis** - Router agent analyzes your query
-        2. **Parallel Fetching** - Category agents fetch news in parallel
-        3. **Data Consolidation** - Duplicate removal and quality filtering
-        4. **Summary Generation** - Summarizer creates executive brief
+        ### Multi-Agent Workflow:
+        
+        **🤖Agents:**
+        - **Query Classifier Agent** - Analyzes your query
+        - **News Gatherer Agents** - Fetch articles by category (parallel)
+        - **Summarizer Agent** - Creates executive summary
+
+        **⚙️Processes:**
+        - **Data Consolidation** - Removes duplicates
     """)
 
 # Main input area
@@ -144,36 +155,55 @@ if run_button and query:
             chat_client = build_chat_client()
             workflow = NewsGatheringWorkflow(chat_client=chat_client)
             
-            # Display workflow progress
+            # ========================================================================
+            # STAGE 1: [query_classification] - Query Classifier Agent
+            # ========================================================================
             with stage_containers["stage1"]:
-                with st.spinner("Stage 1: Analyzing query..."):
+                with st.spinner("Stage 1: Query classification..."):
                     st.markdown(
-                        '<div class="workflow-stage"><div class="stage-title">Stage 1: Query Analysis</div>'
-                        '<div class="stage-content">🔍 Router agent analyzing your query...</div></div>',
+                        '<div class="workflow-stage">'
+                        '<div class="stage-title">🔍 STAGE 1: Query Classifier Agent</div>'
+                        '<div class="stage-content">Analyzing your query to determine relevant news categories...</div>'
+                        '</div>',
                         unsafe_allow_html=True
                     )
             
+            # ========================================================================
+            # STAGE 2: [news_gathering] - News Gatherer Agents (Parallel)
+            # ========================================================================
             with stage_containers["stage2"]:
-                with st.spinner("Stage 2: Fetching news..."):
+                with st.spinner("Stage 2: News gathering..."):
                     st.markdown(
-                        '<div class="workflow-stage"><div class="stage-title">Stage 2: Parallel News Gathering</div>'
-                        '<div class="stage-content">📡 Fetching articles from multiple categories in parallel...</div></div>',
+                        '<div class="workflow-stage">'
+                        '<div class="stage-title">📡 STAGE 2: News Gatherer Agents</div>'
+                        '<div class="stage-content">Multiple gatherer agents fetching articles in parallel (one per category)...</div>'
+                        '</div>',
                         unsafe_allow_html=True
                     )
             
+            # ========================================================================
+            # STAGE 3: [data_consolidation] - Data Processing
+            # ========================================================================
             with stage_containers["stage3"]:
-                with st.spinner("Stage 3: Processing data..."):
+                with st.spinner("Stage 3: Data consolidation..."):
                     st.markdown(
-                        '<div class="workflow-stage"><div class="stage-title">Stage 3: Data Consolidation</div>'
-                        '<div class="stage-content">🧹 Removing duplicates and filtering data...</div></div>',
+                        '<div class="workflow-stage">'
+                        '<div class="stage-title">🧹 STAGE 3: Data Consolidation</div>'
+                        '<div class="stage-content">Removing duplicate articles and consolidating results...</div>'
+                        '</div>',
                         unsafe_allow_html=True
                     )
             
+            # ========================================================================
+            # STAGE 4: [summary_generation] - Summarizer Agent
+            # ========================================================================
             with stage_containers["stage4"]:
-                with st.spinner("Stage 4: Generating summary..."):
+                with st.spinner("Stage 4: Summary generation..."):
                     st.markdown(
-                        '<div class="workflow-stage"><div class="stage-title">Stage 4: Summary Generation</div>'
-                        '<div class="stage-content">✍️ Summarizer agent creating executive brief...</div></div>',
+                        '<div class="workflow-stage">'
+                        '<div class="stage-title">✍️ STAGE 4: Summarizer Agent</div>'
+                        '<div class="stage-content">Creating executive summary from consolidated articles...</div>'
+                        '</div>',
                         unsafe_allow_html=True
                     )
             
