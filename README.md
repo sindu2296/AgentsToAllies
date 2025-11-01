@@ -6,6 +6,27 @@ From Agents to Allies: Empowering Technologists with Multi-Agent AI Workflows
 ### Abstract: 
 This session is built for technologists who want to understand how multi-agent systems work, build them from the ground up, and be part of the rapidly growing ecosystem shaping their future. Instead of abstract concepts, we'll explore this shift through real-time demos and an honest, practical look at the tools and frameworks available today.
 
+## 🐙 GitHub Account Creation
+
+Before starting the workshop, you'll need a GitHub account to access the repository and optionally use GitHub Codespaces.
+
+### Create a GitHub Account:
+
+1. **Visit GitHub**: Go to [https://github.com](https://github.com)
+2. **Sign Up**: Click the **"Sign up"** button in the top right corner
+3. **Create Account**:
+   - Enter your **email address**
+   - Create a **password** (use a strong password)
+   - Choose a **username** (this will be your GitHub handle)
+   - Verify you're human (complete the puzzle/captcha)
+4. **Verify Email**: 
+   - Check your email for a verification code
+   - Enter the code on GitHub to verify your account
+5. **Choose Plan**: Select **"Free"** (perfect for this workshop)
+6. **Complete Setup**: Answer the optional questions about your coding experience
+
+---
+
 ## 🚀 Setup
 
 Choose your development environment:
@@ -111,12 +132,10 @@ Once you've completed either Option 1 or Option 2 above, follow these steps:
 Create a `.env` file in the root directory with the following content:
 
 ```env
-AZURE_OPENAI_API_KEY= "<your_api_key>"
-AZURE_OPENAI_ENDPOINT="<your_endpoint>"
-MODEL_NAME="<your_model_name>"
+MODEL_NAME="gpt-4o"
 NEWSAPI_API_KEY="<news_api_key>"
-AZURE_OPENAI_CHAT_DEPLOYMENT_NAME="<your_model_name>"
-AZURE_AI_MODEL_DEPLOYMENT_NAME="<your_model_name>"
+AZURE_OPENAI_CHAT_DEPLOYMENT_NAME="gpt-4o"
+AZURE_AI_MODEL_DEPLOYMENT_NAME="gpt-4o"
 SERPAPI_API_KEY="<your_serp_api>"
 ```
 
