@@ -132,10 +132,10 @@ Once you've completed either Option 1 or Option 2 above, follow these steps:
 Create a `.env` file in the root directory with the following content:
 
 ```env
-MODEL_NAME="gpt-4o"
+AZURE_OPENAI_API_KEY="<your_openai_key>"
+AZURE_OPENAI_ENDPOINT="<your_azure_openai_endpoint>"
+MODEL_NAME="<model_name>"
 NEWSAPI_API_KEY="<news_api_key>"
-AZURE_OPENAI_CHAT_DEPLOYMENT_NAME="gpt-4o"
-AZURE_AI_MODEL_DEPLOYMENT_NAME="gpt-4o"
 SERPAPI_API_KEY="<your_serp_api>"
 ```
 
