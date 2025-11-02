@@ -6,7 +6,11 @@ import os
 from dotenv import load_dotenv
 from agent_framework.azure import AzureOpenAIChatClient
 
+# Load .env file (won't override existing environment variables)
 load_dotenv()
+
+# Alternative: Use override=True to force .env values over existing environment variables
+# load_dotenv(override=True)
 
 # Azure OpenAI configuration
 api_key = os.getenv("AZURE_OPENAI_API_KEY")
