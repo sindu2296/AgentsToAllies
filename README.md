@@ -6,6 +6,27 @@ From Agents to Allies: Empowering Technologists with Multi-Agent AI Workflows
 ### Abstract: 
 This session is built for technologists who want to understand how multi-agent systems work, build them from the ground up, and be part of the rapidly growing ecosystem shaping their future. Instead of abstract concepts, we'll explore this shift through real-time demos and an honest, practical look at the tools and frameworks available today.
 
+## 🎯 Workshop Workflows
+
+In this workshop, we'll build and explore two complete multi-agent AI workflows that demonstrate real-world applications:
+
+### 📰 News Processing AI Workflow
+We'll create a news analysis system where multiple AI agents collaborate to process and categorize news articles:
+
+![News AI Workflow](news_maf/NewsExtractionAIWorkflow.png)
+
+### 💼 Job Recommendation AI Workflow  
+We'll build a job matching system that helps users find relevant career opportunities:
+
+![Job Recommendation Workflow](job_recommendation_maf/JobRecommendationAIWorkflow.png)
+
+**🚀 What You'll Learn:**
+- How to design multi-agent architectures
+- Practical implementation using Microsoft Agent Framework
+- Real API integrations (SerpAPI, NewsAPI, Azure OpenAI)
+
+---
+
 ## 🐙 GitHub Account Creation
 
 Before starting the workshop, you'll need a GitHub account to access the repository and optionally use GitHub Codespaces.
