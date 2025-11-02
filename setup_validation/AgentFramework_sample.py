@@ -1,9 +1,21 @@
+import os
 import asyncio
+from dotenv import load_dotenv
 from agent_framework.azure import AzureOpenAIChatClient
 from azure.identity import AzureCliCredential
  
+load_dotenv()
+
+model_name = os.getenv("MODEL_NAME")
+deployment = model_name
+
 async def main():
-    agent = AzureOpenAIChatClient(credential=AzureCliCredential()).create_agent(
+    client = AzureOpenAIChatClient(
+        credential=AzureCliCredential(),
+        deployment_name=deployment
+    )
+
+    agent = client.create_agent(
         instructions="You are good at telling jokes.",
         name="Joker"
     )
