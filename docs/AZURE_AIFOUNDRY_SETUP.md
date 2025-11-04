@@ -26,9 +26,38 @@ This guide walks you through setting up Azure AI Foundry to get started with the
 
 ---
 
-## Step 2: Create an Azure AI Foundry Resource
+## Step 2: Create an Azure Subscription (if needed)
 
-Once you've signed in to your Azure account:
+Once you've signed in to your Azure account, you need an active Azure subscription to use Azure services:
+
+### Check for Existing Subscription:
+1. Go to the **Azure Portal** (https://portal.azure.com)
+2. Sign in with your Microsoft account
+3. Check the **Subscription** section in the portal
+
+### If You Don't Have a Subscription:
+
+**For Students:**
+- An **"Azure for Students"** subscription will be created automatically when you sign up using your educational email
+- This provides $100 in free credits with no credit card required
+- The subscription activates immediately after student verification
+
+**For General Users:**
+1. Click **"Subscriptions"** in the Azure Portal
+2. Click **"+ Add"** to create a new subscription
+3. Choose **"Pay-As-You-Go"** or **"Free Trial"**
+4. Complete the billing setup (credit card required for verification)
+5. Accept the terms and create the subscription
+
+### Verify Your Subscription:
+- Ensure your subscription shows as **"Active"** in the portal
+- Note the **Subscription ID** - you'll see this referenced in resource creation
+
+---
+
+## Step 3: Create an Azure AI Foundry Resource
+
+Once you have an active Azure subscription:
 
 1. Go to the **Azure Portal** (https://portal.azure.com)
 2. Click **"+ Create a resource"** button
@@ -44,7 +73,7 @@ Once you've signed in to your Azure account:
 
 ---
 
-## Step 3: Access Azure AI Foundry Portal
+## Step 4: Access Azure AI Foundry Portal
 
 1. After the resource is created, click **"Go to resource"**
 2. On the **Overview** page, you'll see a link to the **Azure AI Foundry portal**
@@ -53,7 +82,7 @@ Once you've signed in to your Azure account:
 
 ---
 
-## Step 4: Deploy a Model
+## Step 5: Deploy a Model
 
 ### Access Models & Endpoints:
 1. In the left sidebar, find and click **"Models + endpoints"**
@@ -74,7 +103,7 @@ Once you've signed in to your Azure account:
 
 ---
 
-## Step 5: Get Azure Credentials
+## Step 6: Get Azure Credentials
 
 Once your model is deployed:
 
@@ -86,7 +115,7 @@ Once your model is deployed:
 
 ---
 
-## Step 6: Configure .env File
+## Step 7: Configure .env File
 
 Now add your Azure credentials to the `.env` file in the project root:
 

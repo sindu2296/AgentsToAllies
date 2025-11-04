@@ -9,29 +9,21 @@ Use these talking points for executive briefings or demos:
 1. **Router decides who should help.** The router agent analyses the user prompt and selects the most relevant news categories.
 2. **Category specialists gather intel.** Dedicated agents call the News plugin to pull JSON headlines for each assigned category.
 3. **Summarizer condenses the feed.** We deduplicate the combined headlines and produce a five-bullet executive summary with inline citations.
-4. **Orchestration pattern is the lever.** Sequential mode demonstrates readable, deterministic control flow; concurrent mode showcases Semantic Kernel’s `ConcurrentOrchestration` for speed.
+4. **Orchestration pattern is the lever.** Sequential mode uses Semantic Kernel's `SequentialOrchestration` for deterministic control flow; concurrent mode showcases `ConcurrentOrchestration` for speed.
 5. **Session memory keeps content fresh.** The concurrent orchestrator hangs on to a short list of recent headlines per category, nudging agents to avoid repeats during the same run.
 
 ## Overview
 
-### 1. Basic Processing (`main_basic.py`)
+### 1. Sequential Processing (`main_sequential.py`)
 
-The simplest implementation using Semantic Kernel’s built-in `SequentialOrchestration`:
-
-- Uses a single technology news agent
-- Demonstrates the predefined pipeline experience
-- Ideal for explaining how Semantic Kernel wires kernels, plugins, and agents together
-
-### 2. Sequential Processing (`main_sequential.py`)
-
-Custom sequential orchestration implemented with async/await:
+Sequential orchestration using Semantic Kernel's `SequentialOrchestration`:
 
 - Router agent chooses 1–3 relevant categories
-- Each category agent runs in turn (no overlap) to keep behaviour predictable
+- Each category agent runs in turn (no overlap) using `SequentialOrchestration` to keep behaviour predictable
 - Deduplication and summarization run after all categories finish
-- Great for discussing custom orchestration logic without relying on SK helpers
+- Demonstrates how to use `SequentialOrchestration` for multi-step workflows
 
-### 3. Concurrent Processing (`main_concurrent.py`)
+### 2. Concurrent Processing (`main_concurrent.py`)
 
 Parallel orchestration using `ConcurrentOrchestration`:
 
@@ -48,12 +40,9 @@ Parallel orchestration using `ConcurrentOrchestration`:
 
    ```bash
    AZURE_OPENAI_ENDPOINT=your_endpoint
+   AZURE_OPENAI_API_KEY=your_key
    MODEL_NAME=your_model_name
-   AI_FOUNDRY_AZURE_OPENAI_API_KEY=your_model_api_key
    NEWSAPI_API_KEY=your_newsapi_key
-   AZURE_OPENAI_CHAT_DEPLOYMENT_NAME=your_model_name
-   AZURE_AI_PROJECT_ENDPOINT=your_endpoint
-   AZURE_AI_MODEL_DEPLOYMENT_NAME=your_model_name
    ```
 
 ## Setup
@@ -80,12 +69,6 @@ Move into the `news` folder before running the samples:
 cd news
 ```
 
-### Basic Processing
-
-```powershell
-python .\src\main_basic.py
-```
-
 ### Sequential Processing
 
 ```powershell
@@ -106,17 +89,17 @@ Suggested demo queries (run sequentially to showcase memory and deduplication):
 
 ## Orchestration Patterns
 
-This repo mirrors the patterns described in [Semantic Kernel’s orchestration documentation](https://learn.microsoft.com/en-us/semantic-kernel/frameworks/agent/agent-orchestration/?pivots=programming-language-python).
+This repo mirrors the patterns described in [Semantic Kernel's orchestration documentation](https://learn.microsoft.com/en-us/semantic-kernel/frameworks/agent/agent-orchestration/?pivots=programming-language-python).
 
 ### Sequential Orchestration
 
-- `src/main_basic.py`: Demonstrates Semantic Kernel’s `SequentialOrchestration` helper.
-- `src/main_sequential.py`: Shows how to implement the same idea manually when you need custom control.
+- `src/main_sequential.py`: Uses Semantic Kernel's `SequentialOrchestration` to process categories one at a time, with each agent wrapped in its own sequential pipeline for consistent orchestration patterns.
 
 ### Concurrent Orchestration
 
 - `src/main_concurrent.py`: Uses `ConcurrentOrchestration` for parallel agent execution.
-- `ConcurrentNewsOrchestrator` keeps a short-lived `_category_memory` dictionary that stores recent headlines per category, adding a hint to the next agent invocation so duplicate headlines are less likely.
+- **Memory Implementation**: `ConcurrentNewsOrchestrator` maintains a `_category_memory` dictionary (in `concurrent_orchestrator.py`, line 32) that stores the last 5 headlines per category. This memory is passed to category agents via the `build_category_agent()` function, which converts it into a text hint (in `category_agent.py`, `_build_memory_hint()`) that's injected into agent instructions. This helps agents avoid repeating the same headlines across multiple queries in the same session.
+- Memory persists only for the orchestrator instance lifetime—restarting the process clears the cache.
 
 ## Architecture Snapshot
 
@@ -138,14 +121,6 @@ Component quick reference:
 - **Orchestrators** – `news/src/orchestration/*.py`
 - **News plugin** – `news/src/plugins/news_plugin.py`
 - **Deduplication helper** – `news/src/utils/dedup.py`
-
-## Code Walkthrough Checklist
-
-1. Review `.env` and `news/src/config.py` to show how the Azure OpenAI connector is registered with the Semantic Kernel.
-2. Explain the News plugin (`news/src/plugins/news_plugin.py`) and how agents call it through function choices.
-3. Walk the router, category, and summarizer agents to highlight instructions and auto function calling (`AzureChatPromptExecutionSettings`).
-4. Contrast `SequentialNewsOrchestrator` vs. `ConcurrentNewsOrchestrator`, highlighting deduplication and the `_category_memory` cache in the concurrent path.
-5. Optional comparison: mention that `news_maf/` contains a Microsoft Agent Framework port for side-by-side evaluation.
 
 ## FAQ
 

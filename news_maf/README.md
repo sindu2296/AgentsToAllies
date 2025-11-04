@@ -59,80 +59,66 @@ Final Output
 
 Sample input and output:
 
-================================================================================
 WORKFLOW EXECUTION
 ================================================================================
-Query: Latest news on diversity and inclusion in tech companies
+Query: What's new in AI and technology for women in computing?
 --------------------------------------------------------------------------------
 
-INFO: [WORKFLOW] Starting news gathering workflow
-INFO: [WORKFLOW] Query: Latest news on diversity and inclusion in tech companies
-INFO: [QUERY_CLASSIFICATION] Analyzing user query
-INFO: [QUERY_CLASSIFICATION] Calling Query Classifier Agent...
-INFO: [QUERY_CLASSIFIER] Raw response: {"targets": ["technology", "business", "general"]}
-INFO: [QUERY_CLASSIFIER] Parsed targets: ['technology', 'business', 'general']
-INFO: [QUERY_CLASSIFIER] Filtered targets: ['technology', 'business', 'general']
-INFO: [QUERY_CLASSIFICATION] Classification complete
-INFO: [QUERY_CLASSIFICATION] Selected categories: ['technology', 'business', 'general']
-INFO: [NEWS_GATHERING] Gathering news from selected categories
-INFO: [NEWS_GATHERING] Categories: ['technology', 'business', 'general']
-INFO: [NEWS_GATHERING] Executing 3 agents in parallel
-INFO: [CONCURRENT_EXECUTION] Building concurrent workflow
+INFO: [WORKFLOW] Starting workflow: What's new in AI and technology for women in computing?
+INFO: ================================================================================
+INFO: Stage 1: Query Classifier Agent
+INFO: ================================================================================
+INFO: → LLM Call: Analyzing query to determine categories...
+INFO: ✓ Selected categories: ['technology', 'science']
+INFO: ================================================================================
+INFO: Stage 2: News Gatherer Agents
+INFO: ================================================================================
+INFO: → Fetching [technology] category
+INFO:   • LLM Call: Agent deciding to call fetch_top_headlines tool...
+INFO:   • Tool Call: fetch_top_headlines(category='technology')
+INFO:   • LLM Call: Agent processing tool results...
+INFO: → Fetching [science] category
+INFO:   • LLM Call: Agent deciding to call fetch_top_headlines tool...
+INFO:   • Tool Call: fetch_top_headlines(category='science')
+INFO:   • LLM Call: Agent processing tool results...
 INFO: Dead-end executors detected (no outgoing edges): ['aggregate_agent_results']. Verify these are intended as final nodes in the workflow.
-INFO: [CONCURRENT_EXECUTION] Executing 3 News Gatherer Agents in parallel...
 INFO: Yielding pre-loop events
 INFO: Starting superstep 1
 INFO: Function name: fetch_top_headlines
 INFO: Function fetch_top_headlines succeeded.
 INFO: Function name: fetch_top_headlines
 INFO: Function fetch_top_headlines succeeded.
-INFO: Function name: fetch_top_headlines
-INFO: Function fetch_top_headlines succeeded.
 INFO: Completed superstep 1
 INFO: Starting superstep 2
-INFO: [CONCURRENT_EXECUTION] Aggregating results from 3 agents
-INFO: [TECHNOLOGY] Parsed 6 articles
-INFO: [BUSINESS] Parsed 6 articles
-INFO: [GENERAL] Parsed 6 articles
+INFO: ✓ [technology] Fetched 6 articles
+INFO: ✓ [science] Fetched 6 articles
 INFO: Completed superstep 2
 INFO: Workflow completed after 2 supersteps
-INFO: [CONCURRENT_EXECUTION] Concurrent execution complete
-INFO: [NEWS_GATHERING] News gathering complete
-INFO: [NEWS_GATHERING] Articles collected: 18
-
-INFO: [DATA_CONSOLIDATION] Consolidating articles
-INFO: [DATA_CONSOLIDATION] Processing 18 raw articles
-INFO: [DATA_CONSOLIDATION] Consolidation complete
-INFO: [DATA_CONSOLIDATION] Unique articles after deduplication: 16
-
-INFO: [SUMMARY_GENERATION] Generating executive summary
-INFO: [SUMMARY_GENERATION] Calling Summarizer Agent with 16 articles...
-INFO: [SUMMARY_GENERATION] Summary generation complete
+INFO: ✓ Gathered 12 articles total
+INFO: ================================================================================
+INFO: Stage 3: Data Consolidation
+INFO: ================================================================================
+INFO: ✓ Removed 0 duplicates
+INFO: ✓ Consolidated to 12 unique articles
+INFO: ================================================================================
+INFO: Stage 4: Summarizer Agent
+INFO: ================================================================================
+INFO: → LLM Call: Generating executive summary from articles...
+INFO: ✓ Executive summary generated
 
 --------------------------------------------------------------------------------
 WORKFLOW OUTPUT:
 --------------------------------------------------------------------------------
-**Categories analyzed (in parallel):** technology, business, general
-*Workflow Statistics: 18 articles gathered, 16 unique articles, 3 categories*
+**Categories (parallel):** technology, science
+**Statistics:** 12 articles gathered, 12 unique, 2 categories
 
-### Executive Summary
+1. Arc Raiders, the popular extraction shooter, has unveiled an ambitious 2025 roadmap including a new map, community events, and quests, signaling continued development and engagement-focused enhancements [Eurogamer](https://www.eurogamer.net/arc-raiders-has-an-impressive-2025-roadmap-and-its-bringing-a-new-map-new-events-and-other-game-changers).
 
-1. **Technology Advancements in Gaming and AI**:
-   - Nintendo released a new hardware bundle featuring "Pokémon Legends: Z-A" for Switch 2 users [Nintendo Life](https://www.nintendolife.com/news/2025/10/reminder-pokemon-legends-z-a-switch-2-hardware-bundle-now-available).
-   - Anthropic enhanced its Claude AI chatbot with "Skills," improving its functionality for workplace tasks [The Verge](https://www.theverge.com/ai-artificial-intelligence/800868/anthropic-claude-skills-ai-agents).
-   - A splinter group emerged in the GZDoom community after developers inserted AI-generated code, creating the UZDoom fork [Ars Technica](https://arstechnica.com/gaming/2025/10/civil-war-gzdoom-fan-developers-split-off-over-use-of-chatgpt-generated-code).
+2. Logitech’s Alto Keys K98M mechanical keyboard introduces enthusiast-grade features such as precise typing feedback and visually appealing design, broadening accessibility in the mechanical keyboard market [The Verge](https://www.theverge.com/tech/810124/logitech-alto-keys-k98m-mechanical-keyboard-price-specs-impressions).
 
-2. **Energy Infrastructure Upgrades**:
-   - The Department of Energy approved a $1.6 billion loan guarantee to modernize transmission lines across five Midwest states, aimed at reducing fossil fuel dependency [Associated Press](https://apnews.com/article/trump-energy-loan-power-transmission-lines-midwest-df38cc75193e29317d706c2d7c03c1eb).
+3. Google Translate is adding an innovative model picker allowing users to choose between "Fast" or "Advanced" translation modes, improving accessibility and tailored usage for diverse needs [9to5Google](http://9to5google.com/2025/11/02/google-translate-model-picker/).
 
-3. **Consumer Health Alert**:
-   - A Consumer Reports investigation revealed lead contamination in certain protein powders, cautioning consumers about potential risks from high exposure [NPR](https://www.npr.org/2025/10/16/nx-s1-5576294/protein-powder-lead-consumer-reports).
+4. Researchers documented unique predatory behavior by orcas flipping great white sharks to access their livers, revealing sophisticated hunting techniques in marine species [NBC News](https://www.nbcnews.com/science/science-news/video-orcas-hunting-great-white-sharks-rcna240951).
 
-4. **Market and Business Concerns**:
-   - Stocks dropped as fears about regional banks' lending practices intensified, prompting market uncertainty [CNBC](https://www.cnbc.com/2025/10/15/stock-market-today-live-updates.html).
-   - United Airlines and Delta warned that extended government shutdowns could significantly harm aviation bookings [CNBC](https://www.cnbc.com/2025/10/16/government-shutdown-united-airlines-ceo-scott-kirby.html).
-
-5. **Obituaries and Political Updates**:
-   - Susan Stamberg, a pioneering woman in U.S. broadcasting and NPR "founding mother," passed away [NPR](https://www.npr.org/2025/10/16/1184880448/susan-stamberg-obituary).
-   - Senate Democrats blocked a military funding bill amidst budget disagreements over the ongoing shutdown [Politico](https://www.politico.com/live-updates/2025/10/16/congress/senate-democrats-military-funding-bill-00611606).
+5. Comet 3I/ATLAS demonstrated non-gravitational acceleration near the Sun and turned blue, providing scientists with intriguing insights into interstellar phenomena and cometary compositions [Fox Weather](https://www.foxweather.com/earth-space/latest-3i-atlas-comet-sun-earth-november-2025).
 ================================================================================

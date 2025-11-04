@@ -176,7 +176,7 @@ SERPAPI_API_KEY="<your_serp_api>"
 #### 2. Get API Keys
 
 **Azure OpenAI credentials**: 
-Refer to [AZURE_AIFOUNDRY_SETUP.md](./AZURE_AIFOUNDRY_SETUP.md) for step-by-step instructions on how to set up Azure AI Foundry and get your API key and endpoint values.
+Refer to [AZURE_AIFOUNDRY_SETUP.md](./docs/AZURE_AIFOUNDRY_SETUP.md) for step-by-step instructions on how to set up Azure AI Foundry and get your API key and endpoint values.
 
 **SERPAPI_API_KEY:**  
 Sign up at https://serpapi.com/. Register with email and phone number to receive a unique API key.
@@ -203,9 +203,8 @@ Located in `AgentFramework_sample.py`, this demonstrates how to:
 Located in the `news` and `news_maf` folders, these samples show **two different frameworks** for building the same multi-agent news system:
 
 #### Semantic Kernel Implementation (`news/`)
-- Basic: Simple sequential processing with one agent
-- Sequential: Multiple agents working one after another
-- Concurrent: Parallel processing with `ConcurrentOrchestration`
+- Sequential: Multiple agents working one after another using `SequentialOrchestration`
+- Concurrent: Parallel processing with `ConcurrentOrchestration` and in-memory category cache
 - Uses: Kernel, plugins, `@kernel_function`, `FunctionChoiceBehavior.Auto()`
 
 #### Microsoft Agent Framework Implementation (`news_maf/`)
