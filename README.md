@@ -6,6 +6,27 @@ From Agents to Allies: Empowering Technologists with Multi-Agent AI Workflows
 ### Abstract: 
 This session is built for technologists who want to understand how multi-agent systems work, build them from the ground up, and be part of the rapidly growing ecosystem shaping their future. Instead of abstract concepts, we'll explore this shift through real-time demos and an honest, practical look at the tools and frameworks available today.
 
+## 🎯 Workshop Workflows
+
+In this workshop, we'll build and explore two complete multi-agent AI workflows that demonstrate real-world applications:
+
+### 📰 News Processing AI Workflow
+We'll create a news extraction workflow where multiple AI agents and processes run to identify categories from user query and summarize the news with top 5 headlines. 
+
+![News AI Workflow](news_maf/NewsExtractionAIWorkflow.png)
+
+### 💼 Job Recommendation AI Workflow  
+We'll build a job recommendation AI worflow that helps users find relevant career opportunities:
+
+![Job Recommendation Workflow](job_recommendation_maf/JobRecommendationAIWorkflow.png)
+
+**🚀 What You'll Learn:**
+- How to design multi-agent architectures
+- Practical implementation using Microsoft Agent Framework
+- Real API integrations (SerpAPI, NewsAPI, Azure OpenAI)
+
+---
+
 ## 🐙 GitHub Account Creation
 
 Before starting the workshop, you'll need a GitHub account to access the repository and optionally use GitHub Codespaces.
@@ -131,6 +152,7 @@ Once you've completed either Option 1 or Option 2 above, follow these steps:
 #### 1. Create .env file at the root folder
 Create a `.env` file in the root directory with the following content:
 
+**For Local Machine Setup:**
 ```env
 AZURE_OPENAI_API_KEY="<your_openai_key>"
 AZURE_OPENAI_ENDPOINT="<your_azure_openai_endpoint>"
@@ -138,6 +160,18 @@ MODEL_NAME="<model_name>"
 NEWSAPI_API_KEY="<news_api_key>"
 SERPAPI_API_KEY="<your_serp_api>"
 ```
+
+**For GitHub Codespaces:**
+```env
+NEWSAPI_API_KEY="<news_api_key>"
+SERPAPI_API_KEY="<your_serp_api>"
+```
+
+> **Note:** When using GitHub Codespaces, `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT`, and `MODEL_NAME` are already configured as repository secrets. You only need to add the NewsAPI and SerpAPI keys.
+
+> **Want to use your own Azure OpenAI credentials in Codespaces?** You can override the repository secrets by:
+> 1. Adding your Azure OpenAI variables to the `.env` file
+> 2. Updating the config files to use `load_dotenv(override=True)` instead of `load_dotenv()`
 
 #### 2. Get API Keys
 
