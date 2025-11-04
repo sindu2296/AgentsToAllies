@@ -10,7 +10,7 @@ This session is built for technologists who want to understand how multi-agent s
 
 In this workshop, we'll build and explore two complete multi-agent AI workflows that demonstrate real-world applications:
 
-### 📰 News Processing AI Workflow
+### 📰 News Extraction AI Workflow
 We'll create a news extraction workflow where multiple AI agents and processes run to identify categories from user query and summarize the news with top 5 headlines. 
 
 ![News AI Workflow](news_maf/NewsExtractionAIWorkflow.png)
