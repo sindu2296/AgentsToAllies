@@ -2,7 +2,7 @@ import json
 import asyncio
 from typing import List
 from semantic_kernel import Kernel
-from semantic_kernel.agents import ChatCompletionAgent
+from semantic_kernel.agents import ChatCompletionAgent, SequentialOrchestration
 from semantic_kernel.agents.runtime import InProcessRuntime
 
 from agents.router_agent import build_router_agent, route_categories
@@ -12,16 +12,12 @@ from utils.dedup import dedup_articles
 
 class SequentialNewsOrchestrator:
     """
-    Orchestrates news fetching sequentially (one category at a time).
+    Orchestrates news fetching sequentially using SequentialOrchestration.
     
     Flow:
     1. Router agent determines relevant categories
-    2. Category agents fetch news one-by-one (sequential processing)
+    2. Category agents fetch news one-by-one using SequentialOrchestration
     3. Summarizer agent creates an executive brief
-    
-    Note: We use a simple loop instead of SequentialOrchestration because
-    SequentialOrchestration passes output from one agent to the next (pipeline),
-    but we need independent fetching from each category.
     """
     
     def __init__(self, kernel: Kernel):
@@ -38,7 +34,7 @@ class SequentialNewsOrchestrator:
         categories = await route_categories(self.router, user_query)
         print(f"[ROUTING] Selected categories: {categories}")
         
-        # Step 2: Fetch news from each category sequentially (one at a time)
+        # Step 2: Fetch news from each category sequentially using SequentialOrchestration
         all_articles = []
         for category in categories:
             print(f"\n[FETCHING] Category: {category}")
@@ -46,10 +42,24 @@ class SequentialNewsOrchestrator:
             # Create a category agent for this category
             category_agent = build_category_agent(self.kernel, f"{category}_agent", category)
             
-            # Invoke the agent - it knows its category from instructions
+            # Create a sequential pipeline with just this agent
+            pipeline = SequentialOrchestration(members=[category_agent])
+            
+            # Invoke the pipeline
+            orchestration_result = await pipeline.invoke(
+                task="Fetch the latest news headlines for your assigned category",
+                runtime=self.runtime
+            )
+            
+            # Get the result from OrchestrationResult
+            results = await orchestration_result.get()
+            
+            # Extract response content
             response = ""
-            async for msg in category_agent.invoke(messages="Fetch the latest news headlines for your assigned category"):
-                response += msg.content.content
+            if results:
+                # Results should be a list, get the first (and only) result
+                result = results[0] if isinstance(results, list) else results
+                response = result.content if hasattr(result, 'content') else str(result)
             
             # Parse the JSON response
             try:
@@ -68,15 +78,25 @@ class SequentialNewsOrchestrator:
         
         print(f"\n[DEDUP] {len(unique_articles)} unique articles after deduplication")
         
-        # Step 4: Summarize using the summarizer agent
+        # Step 4: Summarize using the summarizer agent with SequentialOrchestration
         print(f"[SUMMARIZING] Creating executive brief...")
         summarizer = build_summarizer_agent(self.kernel)
         
-        # Pass articles as input data (not instructions)
+        # Create a sequential pipeline with the summarizer
+        summary_pipeline = SequentialOrchestration(members=[summarizer])
+        
+        # Pass articles as input data
         articles_json = json.dumps(unique_articles)
+        orchestration_result = await summary_pipeline.invoke(task=articles_json, runtime=self.runtime)
+        
+        # Get the result from OrchestrationResult
+        results = await orchestration_result.get()
+        
+        # Extract summary content
         summary = ""
-        async for msg in summarizer.invoke(messages=articles_json):
-            summary += msg.content.content
+        if results:
+            result = results[0] if isinstance(results, list) else results
+            summary = result.content if hasattr(result, 'content') else str(result)
         
         # Step 5: Format final output
         header = f"**Categories analyzed:** {', '.join(categories)}"
