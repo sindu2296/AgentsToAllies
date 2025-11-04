@@ -40,7 +40,7 @@ def format_staged_results(all_messages, user_profile):
 
     # Return only the final summary for main UI display
     if job_summary:
-        return f"# Top 5 Recommended Jobs\n\n**Profile:** {user_profile}\n\n---\n\n{job_summary}"
+        return f"# Top Recommendations\n\n**Profile:** {user_profile}\n\n---\n\n{job_summary}"
     else:
         return f"# Job Recommendation Results\n\n**Profile:** {user_profile}\n\nWorkflow completed but no final summary generated."
 
