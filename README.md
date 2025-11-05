@@ -6,6 +6,14 @@ From Agents to Allies: Empowering Technologists with Multi-Agent AI Workflows
 ### Abstract: 
 This session is built for technologists who want to understand how multi-agent systems work, build them from the ground up, and be part of the rapidly growing ecosystem shaping their future. Instead of abstract concepts, we'll explore this shift through real-time demos and an honest, practical look at the tools and frameworks available today.
 
+## Groups to Join
+Join GHCAgentsToAlliesWorkshop from https://groups.google.com/<img width="1555" height="105" alt="image" src="https://github.com/user-attachments/assets/80886389-432f-4072-8fa7-cd8ee22ebbc4" />
+Search group from "All groups and messages" and join.
+*Need Google Account to join Google Groups*
+
+## Workshop Recording 
+https://youtu.be/AFZ9HIxqJuo
+
 ## 🎯 Workshop Workflows
 
 In this workshop, we'll build and explore two complete multi-agent AI workflows that demonstrate real-world applications:
